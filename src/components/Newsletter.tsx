@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, CheckCircle2 } from 'lucide-react';
+import { CONTACT_CONFIG } from '../config';
 
 export const Newsletter: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +15,12 @@ export const Newsletter: React.FC = () => {
       setError('Bitte gib eine gültige E-Mail-Adresse ein.');
       return;
     }
+
+    // Übergabe an info.phiaesthetics@gmail.com
+    const subject = `Neue Newsletter-Anmeldung (${email.trim()})`;
+    const body = `Hallo Phi Aesthetics Team,\n\nIch möchte mich gerne für den Phi Aesthetics Newsletter anmelden.\n\nE-Mail-Adresse: ${email.trim()}\n\nGesendet an: ${CONTACT_CONFIG.email}`;
+    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
 
     setIsSuccess(true);
   };
@@ -48,12 +55,12 @@ export const Newsletter: React.FC = () => {
             </p>
 
             {isSuccess ? (
-              /* Inline-Erfolgsmeldung */
+              /* Inline-Erfolgsmeldung mit Hinweis zur Übermittlung an die Praxis */
               <div className="p-6 rounded-2xl bg-[#FBF8F6] border border-[#A8C6B0] text-center space-y-2 max-w-md mx-auto">
                 <CheckCircle2 className="w-8 h-8 text-[#775B5D] mx-auto" />
-                <h3 className="font-serif text-xl text-[#3E3335]">Du bist dabei.</h3>
+                <h3 className="font-serif text-xl text-[#3E3335]">Anmeldung übermittelt</h3>
                 <p className="text-sm text-[#3E3335]/80 font-light">
-                  Danke für deine Anmeldung zum Phi Aesthetics Newsletter.
+                  Deine Anmeldung wurde an <strong className="font-medium text-[#3E3335]">{CONTACT_CONFIG.email}</strong> übermittelt. Schön, dass du dabei bist!
                 </p>
               </div>
             ) : (

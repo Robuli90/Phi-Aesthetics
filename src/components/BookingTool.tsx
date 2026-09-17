@@ -14,6 +14,7 @@ import {
   ZONE_PRICES,
   ADDON_OPTIONS,
   OTHER_TREATMENTS,
+  CONTACT_CONFIG,
 } from '../config';
 
 // 30-min slot schedule from 09:00 to 18:00
@@ -201,6 +202,46 @@ export const BookingTool: React.FC = () => {
       setFormError('Bitte gib eine Telefonnummer für Rückfragen an.');
       return;
     }
+
+    // Zusammenfassung für direkte E-Mail-Übermittlung an die Praxisadresse
+    const selectedTreatmentNames: string[] = [];
+    if (treatmentType === 'zones') {
+      selectedZones.forEach((zid) => {
+        const z = ZONE_OPTIONS.find((opt) => opt.id === zid);
+        if (z) selectedTreatmentNames.push(z.name);
+      });
+      selectedAddons.forEach((aid) => {
+        const a = ADDON_OPTIONS.find((opt) => opt.id === aid);
+        if (a) selectedTreatmentNames.push(`Add-on: ${a.name}`);
+      });
+    } else {
+      const other = OTHER_TREATMENTS.find((t) => t.id === selectedOther);
+      if (other) selectedTreatmentNames.push(other.name);
+    }
+
+    const emailSubject = `Neue Terminanfrage von ${clientName.trim()} (${formattedSelectedDate}, ${selectedSlot} Uhr)`;
+    const emailBody = [
+      `Neue Terminanfrage über phiaesthetics:`,
+      `----------------------------------------`,
+      `Name: ${clientName.trim()}`,
+      `E-Mail: ${clientEmail.trim()}`,
+      `Telefon: ${clientPhone.trim()}`,
+      `Wunschtermin: ${formattedSelectedDate} um ${selectedSlot} Uhr`,
+      `Gewählte Behandlung: ${selectedTreatmentNames.join(', ')}`,
+      clientNotes.trim() ? `Persönliche Notiz: ${clientNotes.trim()}` : null,
+      `----------------------------------------`,
+      `Gesendet an: ${CONTACT_CONFIG.email}`,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    // Mailto-Aufruf zur Übergabe an info.phiaesthetics@gmail.com
+    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
+      emailSubject
+    )}&body=${encodeURIComponent(emailBody)}`;
+    
+    // Wir öffnen sanft das Standard-Mailprogramm und bestätigen die Anfrage im UI
+    window.location.href = mailtoUrl;
 
     setIsSubmitted(true);
   };

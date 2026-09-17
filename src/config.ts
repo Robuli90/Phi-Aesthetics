@@ -28,10 +28,10 @@ export const CONTACT_CONFIG = {
   doctorName: 'Dr. Milena Philippi',
   street: 'Musterstrasse 69',
   zipCity: '12345 Musterstadt',
-  email: 'phiaesthetics@gmx.de',
+  email: 'info.phiaesthetics@gmail.com',
   phone: '0173 1234567',
   phoneHref: 'tel:+491731234567',
-  emailHref: 'mailto:phiaesthetics@gmx.de',
+  emailHref: 'mailto:info.phiaesthetics@gmail.com',
   googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Musterstrasse+69+12345+Musterstadt',
   googleMapsApiKey:
     (typeof import.meta !== 'undefined' &&

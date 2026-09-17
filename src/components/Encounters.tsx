@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, Sparkles, Check } from 'lucide-react';
 import logoPhiImg from '../assets/images/Logo_Phi.png';
+import { CONTACT_CONFIG } from '../config';
 
 interface EncountersProps {
   onInterestSubmit?: (eventTitle: string) => void;
 }
 
-export const Encounters: React.FC<EncountersProps> = () => {
+export const Encounters: React.FC<EncountersProps> = ({ onInterestSubmit }) => {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'impressions'>('upcoming');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [registeredEvents, setRegisteredEvents] = useState<Record<string, boolean>>({});
@@ -83,6 +84,14 @@ export const Encounters: React.FC<EncountersProps> = () => {
 
   const handleRegisterInterest = (title: string) => {
     setRegisteredEvents((prev) => ({ ...prev, [title]: true }));
+    if (onInterestSubmit) {
+      onInterestSubmit(title);
+    }
+    // E-Mail-Übermittlung an die Praxis vorbereiten
+    const subject = `Interesse an Event: ${title}`;
+    const body = `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich interessiere mich für das folgende Event und möchte gerne weitere Informationen bzw. einen Platz vormerken:\n\nEvent: ${title}\n\nGesendet an: ${CONTACT_CONFIG.email}`;
+    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoUrl;
   };
 
   return (
