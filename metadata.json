@@ -1,0 +1,6 @@
+{
+  "name": "Phi Aesthetics",
+  "description": "Praxis für ästhetische Medizin – Ärztliche Ästhetik so individuell wie Du. Geleitet von Dr. Milena Philippi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
