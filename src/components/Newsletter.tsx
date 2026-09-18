@@ -17,8 +17,8 @@ export const Newsletter: React.FC = () => {
     }
 
     // Übergabe an info.phiaesthetics@gmail.com
-    const subject = `Neue Newsletter-Anmeldung (${email.trim()})`;
-    const body = `Hallo Phi Aesthetics Team,\n\nIch möchte mich gerne für den Phi Aesthetics Newsletter anmelden.\n\nE-Mail-Adresse: ${email.trim()}\n\nGesendet an: ${CONTACT_CONFIG.email}`;
+    const subject = 'Deine Anfrage an Phi Aesthetics';
+    const body = `Hallo Phi Aesthetics Team,\n\nich möchte mich gerne für den Phi Aesthetics Newsletter anmelden.\n\nE-Mail-Adresse: ${email.trim()}\n\nGesendet an: ${CONTACT_CONFIG.email}`;
     const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoUrl;
 

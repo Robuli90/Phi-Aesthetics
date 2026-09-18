@@ -6,7 +6,6 @@ export type SectionId =
   | 'botox-verstehen'
   | 'termin-buchen'
   | 'phi-news'
-  | 'begegnungen'
   | 'kontakt';
 
 export interface NavItem {

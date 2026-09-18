@@ -1,17 +1,29 @@
 import React, { useState } from 'react';
-import { ArrowUp, X, Shield, FileText, Mail } from 'lucide-react';
+import { ArrowUp, X, Shield, FileText } from 'lucide-react';
 import { PhiLogo } from './PhiLogo';
 import { CONTACT_CONFIG } from '../config';
-import { GmailAdminModal } from './GmailAdminModal';
 
-export const Footer: React.FC = () => {
-  const [activeLegalModal, setActiveLegalModal] = useState<'datenschutz' | 'impressum' | null>(
+interface FooterProps {
+  onNavigateImpressum?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onNavigateImpressum }) => {
+  const [activeLegalModal, setActiveLegalModal] = useState<'datenschutz' | null>(
     null
   );
-  const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleImpressumClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (onNavigateImpressum) {
+      onNavigateImpressum();
+    } else {
+      window.history.pushState(null, '', '/impressum');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
   };
 
   return (
@@ -47,27 +59,20 @@ export const Footer: React.FC = () => {
           <div className="flex items-center gap-6 text-xs text-[#775B5D]">
             <button
               onClick={() => setActiveLegalModal('datenschutz')}
-              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline"
+              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline cursor-pointer"
             >
               Datenschutz
             </button>
-            <button
-              onClick={() => setActiveLegalModal('impressum')}
-              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline"
+            <a
+              href="/impressum"
+              onClick={handleImpressumClick}
+              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline cursor-pointer"
             >
               Impressum
-            </button>
-            <button
-              onClick={() => setIsGmailModalOpen(true)}
-              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline flex items-center gap-1 opacity-80 hover:opacity-100"
-              title="Praxis Gmail-Integration Status & Google-Anmeldung"
-            >
-              <Mail className="w-3.5 h-3.5" />
-              <span>Gmail-Status</span>
-            </button>
+            </a>
             <button
               onClick={scrollToTop}
-              className="p-2 rounded-full border border-[#E9DDDB] text-[#775B5D] hover:bg-[#D8C4C2]/20 transition-colors"
+              className="p-2 rounded-full border border-[#E9DDDB] text-[#775B5D] hover:bg-[#D8C4C2]/20 transition-colors cursor-pointer"
               aria-label="Zurück nach oben"
             >
               <ArrowUp className="w-3.5 h-3.5" />
@@ -76,13 +81,7 @@ export const Footer: React.FC = () => {
         </div>
       </footer>
 
-      {/* Praxis Gmail Integration Admin Modal */}
-      <GmailAdminModal
-        isOpen={isGmailModalOpen}
-        onClose={() => setIsGmailModalOpen(false)}
-      />
-
-      {/* Kompakte, ruhige Hinweisbox für Datenschutz / Impressum */}
+      {/* Kompakte, ruhige Hinweisbox für Datenschutz */}
       {activeLegalModal && (
         <div
           className="fixed inset-0 z-50 bg-[#3E3335]/30 backdrop-blur-xs flex items-center justify-center p-4"
@@ -96,18 +95,14 @@ export const Footer: React.FC = () => {
           >
             <div className="flex items-center justify-between pb-3 border-b border-[#E9DDDB]">
               <div className="flex items-center gap-2">
-                {activeLegalModal === 'datenschutz' ? (
-                  <Shield className="w-4 h-4 text-[#775B5D]" />
-                ) : (
-                  <FileText className="w-4 h-4 text-[#775B5D]" />
-                )}
+                <Shield className="w-4 h-4 text-[#775B5D]" />
                 <h4 className="font-serif text-xl text-[#3E3335]">
-                  {activeLegalModal === 'datenschutz' ? 'Datenschutz' : 'Impressum'}
+                  Datenschutz
                 </h4>
               </div>
               <button
                 onClick={() => setActiveLegalModal(null)}
-                className="p-1 rounded-full text-[#775B5D] hover:bg-[#D8C4C2]/20"
+                className="p-1 rounded-full text-[#775B5D] hover:bg-[#D8C4C2]/20 cursor-pointer"
                 aria-label="Schließen"
               >
                 <X className="w-4 h-4" />
@@ -116,19 +111,17 @@ export const Footer: React.FC = () => {
 
             <div className="py-2 text-sm text-[#3E3335]/85 leading-relaxed font-light">
               <p className="mb-2">
-                {activeLegalModal === 'datenschutz'
-                  ? 'Informationen zur Verarbeitung personenbezogener Daten im Rahmen der ärztlichen Praxis:'
-                  : 'Angaben gemäß § 5 TMG / Praxisinformationen:'}
+                Informationen zur Verarbeitung personenbezogener Daten im Rahmen der ärztlichen Praxis:
               </p>
               <div className="p-4 rounded-xl bg-[#E9DDDB]/30 border border-[#E9DDDB] text-xs text-[#775B5D] italic">
-                Die finalen Rechtstexte werden vor dem Livegang ergänzt.
+                Die finalen Datenschutzbestimmungen werden vor dem Livegang ergänzt.
               </div>
             </div>
 
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setActiveLegalModal(null)}
-                className="px-5 py-2 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors"
+                className="px-5 py-2 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
               >
                 Schließen
               </button>

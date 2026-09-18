@@ -25,14 +25,14 @@ export const ASSETS = {
 
 export const CONTACT_CONFIG = {
   practiceName: 'Phi Aesthetics',
-  doctorName: 'Dr. Milena Philippi',
-  street: 'Musterstrasse 69',
-  zipCity: '12345 Musterstadt',
+  doctorName: 'Dr. med. M. Philippi',
+  street: 'Feldblumenweg 7a',
+  zipCity: '50858 Köln',
   email: 'info.phiaesthetics@gmail.com',
   phone: '0152 33979650',
   phoneHref: 'tel:+4915233979650',
-  emailHref: 'mailto:info.phiaesthetics@gmail.com',
-  googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Musterstrasse+69+12345+Musterstadt',
+  emailHref: 'mailto:info.phiaesthetics@gmail.com?subject=Deine%20Anfrage%20an%20Phi%20Aesthetics',
+  googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Feldblumenweg+7a+50858+K%C3%B6ln',
   googleMapsApiKey:
     (typeof import.meta !== 'undefined' &&
       (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_GOOGLE_MAPS_API_KEY) ||
@@ -47,7 +47,6 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   { id: 'botox-verstehen', label: 'Botox verstehen', href: '#botox-verstehen' },
   { id: 'termin-buchen', label: 'Termin finden', href: '#termin-buchen' },
   { id: 'phi-news', label: 'Phi-News', href: '#phi-news' },
-  { id: 'begegnungen', label: 'Begegnungen', href: '#begegnungen' },
   { id: 'kontakt', label: 'Sprich mit uns', href: '#kontakt' },
 ];
 

@@ -43,8 +43,8 @@ export const ContactSection: React.FC<ContactSectionProps> = () => {
       // @ts-expect-error Google maps global
       if (window.google && window.google.maps && mapContainerRef.current) {
         try {
-          // Default coordinates for Musterstadt or center
-          const coords = { lat: 50.1109, lng: 8.6821 };
+          // Coordinates for Köln Junkersdorf / Feldblumenweg
+          const coords = { lat: 50.9324, lng: 6.8488 };
           // @ts-expect-error Google maps global
           const map = new window.google.maps.Map(mapContainerRef.current, {
             center: coords,

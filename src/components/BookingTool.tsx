@@ -6,17 +6,16 @@ import {
   CheckCircle2,
   Calendar as CalendarIcon,
   Send,
-  AlertCircle,
+  Mail,
   X,
-  Loader2,
-  Shield,
-  Check,
+  Info,
 } from 'lucide-react';
 import {
   ZONE_OPTIONS,
   ZONE_PRICES,
   ADDON_OPTIONS,
   OTHER_TREATMENTS,
+  CONTACT_CONFIG,
 } from '../config';
 
 // 30-min slot schedule from 09:00 to 18:00
@@ -69,7 +68,6 @@ export const BookingTool: React.FC = () => {
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   // Treatment selection state (Defaults to "Botoxbehandlung nach Zonen")
   const [treatmentType, setTreatmentType] = useState<'zones' | 'other'>('zones');
@@ -82,36 +80,9 @@ export const BookingTool: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
-  const [contactPreference, setContactPreference] = useState<string>('E-Mail');
   const [clientNotes, setClientNotes] = useState('');
-  const [consentGiven, setConsentGiven] = useState(false);
-  const [honeypot, setHoneypot] = useState(''); // SPAM protection honeypot
-
-  // Validation errors per field
-  const [fieldErrors, setFieldErrors] = useState<{
-    name?: string;
-    email?: string;
-    phone?: string;
-    treatment?: string;
-    date?: string;
-    slot?: string;
-    consent?: string;
-  }>({});
-
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [confirmationData, setConfirmationData] = useState<{
-    name: string;
-    email: string;
-    phone: string;
-    treatment: string;
-    date: string;
-    slot: string;
-    contactPreference?: string;
-    notes?: string;
-    emailSent?: boolean;
-  } | null>(null);
+  const [mailtoHref, setMailtoHref] = useState('');
 
   const viewYear = currentDate.getFullYear();
   const viewMonth = currentDate.getMonth();
@@ -169,17 +140,13 @@ export const BookingTool: React.FC = () => {
   // Close modal on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        if (showPrivacyModal) {
-          setShowPrivacyModal(false);
-        } else if (isModalOpen) {
-          setIsModalOpen(false);
-        }
+      if (e.key === 'Escape' && isModalOpen) {
+        setIsModalOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, showPrivacyModal]);
+  }, [isModalOpen]);
 
   // Zone selection toggle with validation enforcement
   const handleToggleZone = (zoneId: string) => {
@@ -223,83 +190,14 @@ export const BookingTool: React.FC = () => {
   // When a slot is selected, open the modal popup for step 3
   const handleSelectSlot = (slot: string) => {
     setSelectedSlot(slot);
-    setFieldErrors({});
-    setSubmitError(null);
     setIsModalOpen(true);
   };
 
-  const handleSubmitBooking = async (e: React.FormEvent) => {
+  const handleSubmitBooking = (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitError(null);
-
-    // Bot detection check
-    if (honeypot.trim().length > 0) {
-      // Silently reject bot submission
-      setIsSubmitting(true);
-      setTimeout(() => {
-        setIsSubmitting(false);
-        setIsSubmitted(true);
-      }, 600);
+    if (!clientName.trim() || !clientEmail.trim() || !clientPhone.trim()) {
       return;
     }
-
-    const errors: {
-      name?: string;
-      email?: string;
-      phone?: string;
-      treatment?: string;
-      date?: string;
-      slot?: string;
-      consent?: string;
-    } = {};
-
-    // 1. Name validation
-    if (!clientName.trim() || clientName.trim().length < 2) {
-      errors.name = 'Bitte geben Sie Ihren vollständigen Vor- und Nachnamen an.';
-    }
-
-    // 2. Email validation (RFC format check)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!clientEmail.trim() || !emailRegex.test(clientEmail.trim())) {
-      errors.email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de).';
-    }
-
-    // 3. Phone validation (optional - nur prüfen, falls angegeben)
-    if (clientPhone.trim().length > 0) {
-      const digitsOnly = clientPhone.replace(/\D/g, '');
-      if (digitsOnly.length < 6) {
-        errors.phone = 'Bitte geben Sie eine gültige Telefonnummer an oder lassen Sie das Feld leer.';
-      }
-    }
-
-    // 4. Treatment validation
-    if (!isZoneSelectionValid) {
-      errors.treatment = `Bitte wählen Sie genau ${zoneCount} Zone(n) für Ihre Behandlung aus.`;
-    }
-
-    // 5. Date validation (must not be in the past)
-    if (!selectedDay) {
-      errors.date = 'Bitte wählen Sie einen Behandlungstag im Kalender aus.';
-    } else if (isPastDay(selectedDay)) {
-      errors.date = 'Das gewählte Datum darf nicht in der Vergangenheit liegen.';
-    }
-
-    // 6. Slot validation
-    if (!selectedSlot) {
-      errors.slot = 'Bitte wählen Sie eine Uhrzeit bzw. ein Zeitfenster aus.';
-    }
-
-    // 7. Privacy consent validation
-    if (!consentGiven) {
-      errors.consent = 'Bitte willigen Sie in die Datenverarbeitung zur Bearbeitung Ihrer Anfrage ein.';
-    }
-
-    if (Object.keys(errors).length > 0) {
-      setFieldErrors(errors);
-      return;
-    }
-
-    setFieldErrors({});
 
     const selectedTreatmentNames: string[] = [];
     if (treatmentType === 'zones') {
@@ -316,71 +214,43 @@ export const BookingTool: React.FC = () => {
       if (other) selectedTreatmentNames.push(other.name);
     }
 
-    const treatmentText = selectedTreatmentNames.join(', ');
+    const treatmentText =
+      selectedTreatmentNames.length > 0
+        ? selectedTreatmentNames.join(', ')
+        : treatmentType === 'zones'
+        ? `Botox ${zoneCount} Zone(n)`
+        : 'Behandlung';
+
     const dateText = formattedSelectedDate || '';
-    const dateIso = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
     const slotText = selectedSlot || '';
 
-    setIsSubmitting(true);
+    // Vorgeschriebener Betreff: "Deine Anfrage an Phi Aesthetics"
+    const subject = 'Deine Anfrage an Phi Aesthetics';
+    const body = `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich möchte gerne folgende Terminanfrage stellen:\n\n• Name: ${clientName.trim()}\n• E-Mail: ${clientEmail.trim()}\n• Telefonnummer: ${clientPhone.trim()}\n• Behandlung: ${treatmentText}\n• Wunschtermin: ${dateText} um ${slotText} Uhr${
+      clientNotes.trim() ? `\n• Anmerkungen / Fragen: ${clientNotes.trim()}` : ''
+    }\n\nIch freue mich über eine Rückmeldung und die Bestätigung meines Termins.\n\nViele Grüße,\n${clientName.trim()}`;
 
-    try {
-      // Serverseitige Verarbeitung und E-Mail-Versand
-      const res = await fetch('/api/appointments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: clientName.trim(),
-          email: clientEmail.trim(),
-          phone: clientPhone.trim(),
-          treatment: treatmentText,
-          date: dateText,
-          dateIso,
-          slot: slotText,
-          contactPreference,
-          notes: clientNotes.trim(),
-          consent: consentGiven,
-          hp_field: honeypot,
-        }),
-      });
+    const url = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
 
-      const result = await res.json();
-      if (!res.ok) {
-        throw new Error(result.error || 'Ihre Anfrage konnte nicht verarbeitet werden.');
-      }
+    setMailtoHref(url);
 
-      setConfirmationData({
-        name: clientName.trim(),
-        email: clientEmail.trim(),
-        phone: clientPhone.trim(),
-        treatment: treatmentText,
-        date: dateText,
-        slot: slotText,
-        contactPreference,
-        notes: clientNotes.trim(),
-        emailSent: result.emailSent,
-      });
+    // Öffnet direkt das Mailprogramm des Anfragenden
+    window.location.href = url;
 
-      setIsSubmitted(true);
-    } catch (err: any) {
-      console.error('Fehler beim Absenden der Terminanfrage:', err);
-      // Strictly do not show false success message
-      setSubmitError(
-        err.message ||
-          'Die Terminanfrage konnte per E-Mail leider nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns direkt an.'
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitted(true);
   };
 
   const resetBooking = () => {
     setIsSubmitted(false);
     setIsModalOpen(false);
     setSelectedSlot(null);
-    setFieldErrors({});
-    setSubmitError(null);
+    setClientName('');
+    setClientEmail('');
+    setClientPhone('');
+    setClientNotes('');
+    setMailtoHref('');
   };
 
   const formattedSelectedDate = selectedDay
@@ -622,6 +492,20 @@ export const BookingTool: React.FC = () => {
               </div>
             </div>
           )}
+
+          {/* Hinweis zur Abrechnung (GOÄ) */}
+          <div
+            id="booking-goae-notice"
+            className="mt-6 p-4 sm:p-5 rounded-2xl bg-[#E9DDDB]/20 border border-[#D8C4C2] flex items-start sm:items-center gap-3.5 shadow-2xs"
+          >
+            <div className="p-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-[#775B5D] shrink-0 mt-0.5 sm:mt-0">
+              <Info className="w-4 h-4" />
+            </div>
+            <p className="text-xs sm:text-sm text-[#3E3335] leading-relaxed font-light">
+              <span className="font-medium text-[#775B5D]">Hinweis zur Abrechnung:</span>{' '}
+              Die Abrechnung sämtlicher medizinischer Leistungen erfolgt transparent und gesetzeskonform auf Grundlage der amtlichen Gebührenordnung für Ärzte (GOÄ).
+            </p>
+          </div>
         </div>
 
         {/* SCHRITT 2: DARUNTER EBENFALLS ÜBER DIE GANZE BREITE */}
@@ -638,7 +522,43 @@ export const BookingTool: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="relative rounded-2xl overflow-hidden">
+            {/* Hinweis über dem ausgegrauten Bereich */}
+            <div className="absolute inset-0 z-20 flex items-center justify-center p-4 sm:p-6 bg-[#FBF8F6]/75 backdrop-blur-[2px]">
+              <div className="max-w-lg w-full p-6 sm:p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] shadow-xl text-center space-y-4">
+                <div className="w-12 h-12 rounded-full bg-[#E9DDDB]/60 border border-[#D8C4C2] flex items-center justify-center mx-auto text-[#775B5D]">
+                  <CalendarIcon className="w-6 h-6 text-[#775B5D]" />
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-serif text-xl sm:text-2xl text-[#3E3335]">
+                    Terminbuchung in Kürze verfügbar
+                  </h4>
+                  <p className="text-sm sm:text-base text-[#3E3335] leading-relaxed font-light">
+                    Terminbuchungen werden in wenigen Tagen freigeschaltet. Bis dahin bitten wir Sie uns einfach eine Anfrage via Mail zu schicken.
+                  </p>
+                </div>
+                <div className="pt-2">
+                  <a
+                    href={`mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
+                      'Deine Anfrage an Phi Aesthetics'
+                    )}&body=${encodeURIComponent(
+                      `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich interessiere mich für eine Behandlung bei Phi Aesthetics:\n\nBehandlung: ${
+                        treatmentType === 'zones'
+                          ? `Botox ${zoneCount} Zone(n)`
+                          : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name || 'Behandlung'
+                      }\n\nBitte gebt mir Bescheid, welche Termine verfügbar sind.\n\nViele Grüße`
+                    )}`}
+                    className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium uppercase tracking-wider hover:bg-[#3E3335] transition-all shadow-sm cursor-pointer"
+                  >
+                    <Mail className="w-4 h-4 text-[#D8C4C2]" />
+                    <span>Anfrage via Mail schicken</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Ausgegrauter Kalender & freie Slots */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start opacity-30 grayscale pointer-events-none select-none filter blur-[0.5px]">
             {/* Kalender Widget (Links / 7 Spalten) */}
             <div className="lg:col-span-7 p-5 sm:p-6 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB]">
               {/* Calendar Month Header */}
@@ -724,9 +644,6 @@ export const BookingTool: React.FC = () => {
                       onClick={() => {
                         setSelectedDay(dayNum);
                         setSelectedSlot(null);
-                        if (fieldErrors.date) {
-                          setFieldErrors((prev) => ({ ...prev, date: undefined }));
-                        }
                       }}
                       className={`relative h-10 sm:h-11 rounded-lg flex flex-col items-center justify-center text-xs font-medium transition-all ${
                         isSelected
@@ -791,8 +708,25 @@ export const BookingTool: React.FC = () => {
                     })}
                   </div>
                 ) : (
-                  <div className="p-6 rounded-xl bg-[#FBF8F6] border border-[#D69292]/40 text-xs text-[#775B5D] text-center">
-                    An diesem Tag sind leider keine freien Termine verfügbar. Bitte wählen Sie einen Tag mit grünem Punkt.
+                  <div className="p-6 rounded-xl bg-[#FBF8F6] border border-[#D69292]/40 text-xs text-[#775B5D] text-center space-y-2.5">
+                    <p>An diesem Tag sind regulär keine freien Termine im Kalender verfügbar.</p>
+                    <div>
+                      <a
+                        href={`mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
+                          'Deine Anfrage an Phi Aesthetics'
+                        )}&body=${encodeURIComponent(
+                          `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich interessiere mich für einen Termin rund um den ${formattedSelectedDate}.\n\nBehandlung: ${
+                            treatmentType === 'zones'
+                              ? `Botox ${zoneCount} Zone(n)`
+                              : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name || 'Behandlung'
+                          }\n\nBitte gebt mir Bescheid, welche Termine oder Ausweichmöglichkeiten verfügbar sind.\n\nViele Grüße`
+                        )}`}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#E9DDDB]/60 border border-[#E9DDDB] text-xs font-medium text-[#3E3335] hover:bg-[#775B5D] hover:text-[#FBF8F6] transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        <span>Termin per E-Mail anfragen</span>
+                      </a>
+                    </div>
                   </div>
                 )}
               </div>
@@ -815,13 +749,14 @@ export const BookingTool: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
 
         {/* SCHRITT 3: ALS POPUP / MODAL (NUR WENN WUNSCHTERMIN AUSGEWÄHLT IST) */}
         {isModalOpen && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E3335]/50 backdrop-blur-xs overflow-y-auto"
             onClick={(e) => {
-              if (e.target === e.currentTarget && !isSubmitting) {
+              if (e.target === e.currentTarget) {
                 setIsModalOpen(false);
               }
             }}
@@ -833,9 +768,8 @@ export const BookingTool: React.FC = () => {
               {/* Schließen Button */}
               <button
                 type="button"
-                disabled={isSubmitting}
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 hover:text-[#3E3335] transition-colors focus:outline-none disabled:opacity-40 cursor-pointer"
+                className="absolute top-5 right-5 p-2 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 hover:text-[#3E3335] transition-colors focus:outline-none cursor-pointer"
                 aria-label="Fenster schließen"
               >
                 <X className="w-5 h-5" />
@@ -866,31 +800,7 @@ export const BookingTool: React.FC = () => {
                     </div>
                   </div>
 
-                  {submitError && (
-                    <div className="mb-4 p-3.5 rounded-xl bg-[#D69292]/20 border border-[#D69292] text-xs text-[#775B5D] flex items-start gap-2.5">
-                      <AlertCircle className="w-4 h-4 shrink-0 text-[#C45E5E] mt-0.5" />
-                      <div>
-                        <p className="font-medium text-[#3E3335] mb-0.5">Übermittlung fehlgeschlagen</p>
-                        <p>{submitError}</p>
-                      </div>
-                    </div>
-                  )}
-
                   <form onSubmit={handleSubmitBooking} className="space-y-4">
-                    {/* Unsichtbares Honeypot-Feld gegen Spam-Bots */}
-                    <div className="hidden" aria-hidden="true">
-                      <label htmlFor="hp_field">Bitte dieses Feld freilassen</label>
-                      <input
-                        type="text"
-                        id="hp_field"
-                        name="hp_field"
-                        value={honeypot}
-                        onChange={(e) => setHoneypot(e.target.value)}
-                        tabIndex={-1}
-                        autoComplete="off"
-                      />
-                    </div>
-
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-medium text-[#3E3335] mb-1">
@@ -899,23 +809,11 @@ export const BookingTool: React.FC = () => {
                         <input
                           type="text"
                           required
-                          disabled={isSubmitting}
                           value={clientName}
-                          onChange={(e) => {
-                            setClientName(e.target.value);
-                            if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
-                          }}
+                          onChange={(e) => setClientName(e.target.value)}
                           placeholder="z. B. Sophie Weber"
-                          className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
-                            fieldErrors.name ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
-                          }`}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] transition-colors"
                         />
-                        {fieldErrors.name && (
-                          <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3 shrink-0" />
-                            {fieldErrors.name}
-                          </p>
-                        )}
                       </div>
 
                       <div>
@@ -925,73 +823,26 @@ export const BookingTool: React.FC = () => {
                         <input
                           type="email"
                           required
-                          disabled={isSubmitting}
                           value={clientEmail}
-                          onChange={(e) => {
-                            setClientEmail(e.target.value);
-                            if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
-                          }}
+                          onChange={(e) => setClientEmail(e.target.value)}
                           placeholder="ihre.email@beispiel.de"
-                          className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
-                            fieldErrors.email ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
-                          }`}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] transition-colors"
                         />
-                        {fieldErrors.email && (
-                          <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3 shrink-0" />
-                            {fieldErrors.email}
-                          </p>
-                        )}
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-medium text-[#3E3335] mb-1">
-                        Telefonnummer (optional)
+                        Telefonnummer *
                       </label>
                       <input
                         type="tel"
-                        disabled={isSubmitting}
+                        required
                         value={clientPhone}
-                        onChange={(e) => {
-                          setClientPhone(e.target.value);
-                          if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
-                        }}
+                        onChange={(e) => setClientPhone(e.target.value)}
                         placeholder="z. B. 0152 33979650"
-                        className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
-                          fieldErrors.phone ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
-                        }`}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] transition-colors"
                       />
-                      {fieldErrors.phone && (
-                        <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3 shrink-0" />
-                          {fieldErrors.phone}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Optionale bevorzugte Kontaktart */}
-                    <div>
-                      <label className="block text-xs font-medium text-[#3E3335] mb-1.5">
-                        Bevorzugte Kontaktart (optional)
-                      </label>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {['E-Mail', 'Telefonanruf', 'WhatsApp / SMS', 'Keine Präferenz'].map((opt) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            disabled={isSubmitting}
-                            onClick={() => setContactPreference(opt)}
-                            className={`py-2 px-2 text-xs rounded-xl border text-center transition-all cursor-pointer ${
-                              contactPreference === opt
-                                ? 'bg-[#775B5D] border-[#775B5D] text-[#FBF8F6] font-medium'
-                                : 'bg-[#FBF8F6] border-[#E9DDDB] text-[#3E3335] hover:border-[#775B5D]/60'
-                            }`}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
                     </div>
 
                     <div>
@@ -1000,76 +851,28 @@ export const BookingTool: React.FC = () => {
                       </label>
                       <textarea
                         rows={2}
-                        disabled={isSubmitting}
                         value={clientNotes}
                         onChange={(e) => setClientNotes(e.target.value)}
                         placeholder="Gibt es etwas, worauf wir besonders achten dürfen oder Fragen zur Behandlung?"
-                        className="w-full px-3.5 py-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D]"
                       />
                     </div>
 
-                    {/* Datenschutz Einwilligung Checkbox */}
-                    <div className="pt-1">
-                      <label className="flex items-start gap-2.5 cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={consentGiven}
-                          disabled={isSubmitting}
-                          onChange={(e) => {
-                            setConsentGiven(e.target.checked);
-                            if (fieldErrors.consent) setFieldErrors((prev) => ({ ...prev, consent: undefined }));
-                          }}
-                          className="mt-0.5 h-4 w-4 rounded border-[#E9DDDB] text-[#775B5D] focus:ring-[#775B5D] cursor-pointer"
-                        />
-                        <span className="text-[11px] text-[#775B5D] leading-relaxed">
-                          Ich willige ein, dass meine Daten zur Bearbeitung und Beantwortung meiner Terminanfrage verarbeitet werden. Hinweis: Sie können Ihre Einwilligung jederzeit für die Zukunft widerrufen. Weitere Informationen finden Sie in der{' '}
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              setShowPrivacyModal(true);
-                            }}
-                            className="text-[#3E3335] underline font-medium hover:text-[#775B5D] cursor-pointer"
-                          >
-                            Datenschutzerklärung
-                          </button>
-                          .*
-                        </span>
-                      </label>
-                      {fieldErrors.consent && (
-                        <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
-                          <AlertCircle className="w-3 h-3 shrink-0" />
-                          {fieldErrors.consent}
-                        </p>
-                      )}
-                    </div>
-
                     <div className="text-[11px] text-[#775B5D]/80 bg-[#E9DDDB]/20 p-2.5 rounded-xl border border-[#E9DDDB]/60 leading-relaxed">
-                      Dies ist eine unverbindliche Terminanfrage. Der Termin ist erst nach unserer Bestätigung fest vereinbart. Es findet keine Vorauszahlung statt.
+                      Beim Absenden öffnet sich dein E-Mail-Programm mit allen ausgewählten Termindaten vorformuliert an <strong>info.phiaesthetics@gmail.com</strong>.
                     </div>
 
                     <button
                       id="submit-booking-btn"
                       type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-75 cursor-pointer disabled:cursor-not-allowed"
+                      className="w-full py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2 cursor-pointer"
                     >
-                      {isSubmitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 text-[#D8C4C2] animate-spin" />
-                          <span>Terminanfrage wird übermittelt...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Send className="w-4 h-4 text-[#D8C4C2]" />
-                          <span>Termin anfragen</span>
-                        </>
-                      )}
+                      <Mail className="w-4 h-4 text-[#D8C4C2]" />
+                      <span>Termin per E-Mail anfragen</span>
                     </button>
                   </form>
                 </>
               ) : (
-                /* Verständliche Bestätigung auf der Website (gemäß Anforderung 9) */
                 <div className="py-4 text-center space-y-4">
                   <div className="w-14 h-14 rounded-full bg-[#A8C6B0]/30 border border-[#A8C6B0] flex items-center justify-center mx-auto text-[#775B5D]">
                     <CheckCircle2 className="w-8 h-8 text-[#775B5D]" />
@@ -1077,135 +880,84 @@ export const BookingTool: React.FC = () => {
 
                   <div className="space-y-1.5">
                     <h3 className="font-serif text-2xl text-[#3E3335]">
-                      Vielen Dank für Ihre Anfrage.
+                      E-Mail-Anfrage vorbereitet!
                     </h3>
                     <p className="text-sm text-[#3E3335]/90 font-light leading-relaxed max-w-md mx-auto">
-                      Wir haben Ihre Terminanfrage erhalten und melden uns schnellstmöglich bei Ihnen.
+                      Dein E-Mail-Programm öffnet sich mit deiner vorformulierten Anfrage an <strong>{CONTACT_CONFIG.email}</strong>.
                     </p>
                   </div>
+
+                  {mailtoHref && (
+                    <div className="pt-1">
+                      <a
+                        href={mailtoHref}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium uppercase tracking-wider hover:bg-[#3E3335] transition-all shadow-xs"
+                      >
+                        <Mail className="w-4 h-4" />
+                        <span>Im Mailprogramm öffnen & absenden</span>
+                      </a>
+                      <p className="text-[11px] text-[#775B5D]/70 mt-1.5">
+                        Klicke hier, falls sich dein Mailprogramm nicht automatisch geöffnet hat.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Zusammenfassung der Daten */}
                   <div className="bg-[#FBF8F6] border border-[#E9DDDB] rounded-2xl p-4 text-left text-xs text-[#3E3335] space-y-2 max-w-md mx-auto">
                     <div className="font-medium text-[#775B5D] border-b border-[#E9DDDB] pb-1 uppercase tracking-wider text-[10px]">
-                      Zusammenfassung Ihrer Terminanfrage
+                      Zusammenfassung der Terminanfrage
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D]">Empfänger:</span>
+                      <span className="font-medium text-right text-[#775B5D]">{CONTACT_CONFIG.email}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D]">Betreff:</span>
+                      <span className="font-medium text-right">Deine Anfrage an Phi Aesthetics</span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
                       <span className="text-[#775B5D]">Name:</span>
-                      <span className="font-medium text-right">{confirmationData?.name}</span>
+                      <span className="font-medium text-right">{clientName}</span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
                       <span className="text-[#775B5D]">E-Mail-Adresse:</span>
-                      <span className="font-medium text-right">{confirmationData?.email}</span>
+                      <span className="font-medium text-right">{clientEmail}</span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
                       <span className="text-[#775B5D]">Telefonnummer:</span>
-                      <span className="font-medium text-right">
-                        {confirmationData?.phone ? confirmationData.phone : 'Nicht angegeben'}
-                      </span>
+                      <span className="font-medium text-right">{clientPhone}</span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
                       <span className="text-[#775B5D]">Behandlung:</span>
-                      <span className="font-medium text-right">{confirmationData?.treatment}</span>
+                      <span className="font-medium text-right">
+                        {treatmentType === 'zones'
+                          ? `Botox ${zoneCount} Zone(n)`
+                          : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name}
+                      </span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
                       <span className="text-[#775B5D]">Wunschtermin:</span>
-                      <span className="font-medium text-right">{confirmationData?.date} um {confirmationData?.slot} Uhr</span>
+                      <span className="font-medium text-right">{formattedSelectedDate} um {selectedSlot} Uhr</span>
                     </div>
-                    {confirmationData?.contactPreference && (
-                      <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
-                        <span className="text-[#775B5D]">Bevorzugte Kontaktart:</span>
-                        <span className="font-medium text-right">{confirmationData.contactPreference}</span>
-                      </div>
-                    )}
-                    {confirmationData?.notes && (
+                    {clientNotes && (
                       <div className="pt-1 text-[11px] text-[#775B5D]">
-                        <span className="font-medium text-[#3E3335] block mb-0.5">Ihre Nachricht / Anmerkungen:</span>
-                        <span className="italic">{confirmationData.notes}</span>
+                        <span className="font-medium text-[#3E3335] block mb-0.5">Ihre Anmerkung:</span>
+                        <span className="italic">{clientNotes}</span>
                       </div>
                     )}
-                  </div>
-
-                  {/* Klarer Hinweis zur Unverbindlichkeit & Eingangsbestätigung */}
-                  <div className="p-3.5 bg-[#A8C6B0]/20 border border-[#A8C6B0] rounded-xl text-xs text-[#3E3335] max-w-md mx-auto leading-relaxed text-left space-y-1">
-                    <p className="font-medium text-[#775B5D] flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5" />
-                      Hinweis zur Terminvereinbarung:
-                    </p>
-                    <p className="text-[#3E3335]/90 text-[11px]">
-                      Bitte beachten Sie: Dies ist eine unverbindliche Terminanfrage. Der Termin ist erst nach unserer persönlichen Bestätigung durch die Praxis verbindlich vereinbart.
-                    </p>
-                    <p className="text-[#3E3335]/90 text-[11px] pt-1">
-                      Eine Eingangsbestätigung wurde an <strong>{confirmationData?.email}</strong> gesendet.
-                    </p>
                   </div>
 
                   <div className="pt-2">
                     <button
                       type="button"
                       onClick={resetBooking}
-                      className="px-8 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
+                      className="px-8 py-2.5 rounded-full border border-[#E9DDDB] text-[#775B5D] text-xs uppercase tracking-wider font-medium hover:bg-[#E9DDDB]/30 transition-colors cursor-pointer"
                     >
                       Schließen
                     </button>
                   </div>
                 </div>
               )}
-            </div>
-          </div>
-        )}
-
-        {/* MODAL: DATENSCHUTZERKLÄRUNG HINWEIS */}
-        {showPrivacyModal && (
-          <div
-            className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[#3E3335]/60 backdrop-blur-xs"
-            onClick={() => setShowPrivacyModal(false)}
-            role="dialog"
-            aria-modal="true"
-          >
-            <div
-              className="relative w-full max-w-md bg-[#FBF8F6] rounded-2xl border border-[#E9DDDB] shadow-2xl p-6 text-[#3E3335] animate-in fade-in zoom-in-95 duration-150"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E9DDDB]">
-                <h4 className="font-serif text-lg text-[#3E3335] flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-[#775B5D]" />
-                  Datenschutzhinweis zur Terminanfrage
-                </h4>
-                <button
-                  type="button"
-                  onClick={() => setShowPrivacyModal(false)}
-                  className="p-1 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="text-xs text-[#775B5D] space-y-2.5 leading-relaxed">
-                <p>
-                  Mit dem Absenden des Formulars willigen Sie ein, dass PHI Aesthetics (Dr. med. Milena Philippi) Ihre eingegebenen Daten (Name, E-Mail-Adresse, Telefonnummer, gewählte Behandlung, Wunschzeit und Anmerkungen) verarbeitet.
-                </p>
-                <p>
-                  <strong>Zweck:</strong> Die Datenverarbeitung erfolgt ausschließlich zur Bearbeitung, Koordinierung und Beantwortung Ihrer Terminanfrage (Art. 6 Abs. 1 lit. b und a DSGVO).
-                </p>
-                <p>
-                  <strong>Speicherung & Weitergabe:</strong> Ihre Daten werden vertraulich behandelt und nicht an unbefugte Dritte weitergegeben.
-                </p>
-                <p>
-                  <strong>Widerrufsrecht:</strong> Sie können Ihre erteilte Einwilligung jederzeit mit Wirkung für die Zukunft per E-Mail an{' '}
-                  <a href="mailto:info.phiaesthetics@gmail.com" className="underline font-medium text-[#3E3335]">
-                    info.phiaesthetics@gmail.com
-                  </a>{' '}
-                  widerrufen.
-                </p>
-              </div>
-              <div className="mt-5 pt-3 border-t border-[#E9DDDB] text-right">
-                <button
-                  type="button"
-                  onClick={() => setShowPrivacyModal(false)}
-                  className="px-5 py-2 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
-                >
-                  Verstanden
-                </button>
-              </div>
             </div>
           </div>
         )}

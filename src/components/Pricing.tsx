@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar, Info } from 'lucide-react';
 import { ADDON_OPTIONS, OTHER_TREATMENTS } from '../config';
 
 interface PricingProps {
@@ -148,6 +148,20 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* Hinweis zur Abrechnung (GOÄ) */}
+        <div
+          id="pricing-goae-notice"
+          className="mb-8 p-4 sm:p-5 rounded-2xl bg-[#E9DDDB]/20 border border-[#D8C4C2] max-w-3xl mx-auto flex items-start sm:items-center gap-3.5 shadow-2xs"
+        >
+          <div className="p-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-[#775B5D] shrink-0 mt-0.5 sm:mt-0">
+            <Info className="w-4 h-4" />
+          </div>
+          <p className="text-xs sm:text-sm text-[#3E3335] leading-relaxed font-light">
+            <span className="font-medium text-[#775B5D]">Hinweis zur Abrechnung:</span>{' '}
+            Die Abrechnung sämtlicher medizinischer Leistungen erfolgt transparent und gesetzeskonform auf Grundlage der amtlichen Gebührenordnung für Ärzte (GOÄ).
+          </p>
         </div>
 
         {/* Ruhige, medizinisch verantwortungsvolle Zeile & Buchungslink */}
