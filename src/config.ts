@@ -29,8 +29,8 @@ export const CONTACT_CONFIG = {
   street: 'Musterstrasse 69',
   zipCity: '12345 Musterstadt',
   email: 'info.phiaesthetics@gmail.com',
-  phone: '0173 1234567',
-  phoneHref: 'tel:+491731234567',
+  phone: '0152 33979650',
+  phoneHref: 'tel:+4915233979650',
   emailHref: 'mailto:info.phiaesthetics@gmail.com',
   googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Musterstrasse+69+12345+Musterstadt',
   googleMapsApiKey:

@@ -9,6 +9,8 @@ import {
   AlertCircle,
   X,
   Loader2,
+  Shield,
+  Check,
 } from 'lucide-react';
 import {
   ZONE_OPTIONS,
@@ -46,13 +48,19 @@ function getDayAvailability(year: number, month: number, day: number) {
 
 export const BookingTool: React.FC = () => {
   // Calendar current view state (defaults to today's month)
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, []);
+
   const [currentDate, setCurrentDate] = useState(() => new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(() => {
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth();
-    const today = now.getDate();
-    for (let d = today; d <= 28; d++) {
+    const todayDate = now.getDate();
+    for (let d = todayDate; d <= 28; d++) {
       const avail = getDayAvailability(curYear, curMonth, d);
       if (avail.hasSlots) return d;
     }
@@ -61,6 +69,7 @@ export const BookingTool: React.FC = () => {
 
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
 
   // Treatment selection state (Defaults to "Botoxbehandlung nach Zonen")
   const [treatmentType, setTreatmentType] = useState<'zones' | 'other'>('zones');
@@ -73,8 +82,22 @@ export const BookingTool: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
   const [clientPhone, setClientPhone] = useState('');
+  const [contactPreference, setContactPreference] = useState<string>('E-Mail');
   const [clientNotes, setClientNotes] = useState('');
-  const [formError, setFormError] = useState<string | null>(null);
+  const [consentGiven, setConsentGiven] = useState(false);
+  const [honeypot, setHoneypot] = useState(''); // SPAM protection honeypot
+
+  // Validation errors per field
+  const [fieldErrors, setFieldErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+    treatment?: string;
+    date?: string;
+    slot?: string;
+    consent?: string;
+  }>({});
+
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -85,11 +108,25 @@ export const BookingTool: React.FC = () => {
     treatment: string;
     date: string;
     slot: string;
+    contactPreference?: string;
+    notes?: string;
     emailSent?: boolean;
   } | null>(null);
 
   const viewYear = currentDate.getFullYear();
   const viewMonth = currentDate.getMonth();
+
+  // Helper to check if a specific day is in the past
+  const isPastDay = (dayNum: number): boolean => {
+    const dayDate = new Date(viewYear, viewMonth, dayNum);
+    dayDate.setHours(0, 0, 0, 0);
+    return dayDate.getTime() < today.getTime();
+  };
+
+  // Prevent navigating to past months
+  const canGoPrevMonth =
+    viewYear > today.getFullYear() ||
+    (viewYear === today.getFullYear() && viewMonth > today.getMonth());
 
   // Dynamic price calculation
   const calculatedPrice = useMemo(() => {
@@ -117,6 +154,7 @@ export const BookingTool: React.FC = () => {
   ];
 
   const handlePrevMonth = () => {
+    if (!canGoPrevMonth) return;
     setCurrentDate(new Date(viewYear, viewMonth - 1, 1));
     setSelectedDay(null);
     setSelectedSlot(null);
@@ -131,13 +169,17 @@ export const BookingTool: React.FC = () => {
   // Close modal on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isModalOpen) {
-        setIsModalOpen(false);
+      if (e.key === 'Escape') {
+        if (showPrivacyModal) {
+          setShowPrivacyModal(false);
+        } else if (isModalOpen) {
+          setIsModalOpen(false);
+        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
+  }, [isModalOpen, showPrivacyModal]);
 
   // Zone selection toggle with validation enforcement
   const handleToggleZone = (zoneId: string) => {
@@ -181,39 +223,83 @@ export const BookingTool: React.FC = () => {
   // When a slot is selected, open the modal popup for step 3
   const handleSelectSlot = (slot: string) => {
     setSelectedSlot(slot);
-    setFormError(null);
+    setFieldErrors({});
+    setSubmitError(null);
     setIsModalOpen(true);
   };
 
   const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    setFormError(null);
     setSubmitError(null);
 
-    if (!selectedDay) {
-      setFormError('Bitte wähle einen verfügbaren Behandlungstag im Kalender.');
+    // Bot detection check
+    if (honeypot.trim().length > 0) {
+      // Silently reject bot submission
+      setIsSubmitting(true);
+      setTimeout(() => {
+        setIsSubmitting(false);
+        setIsSubmitted(true);
+      }, 600);
       return;
     }
-    if (!selectedSlot) {
-      setFormError('Bitte wähle eine freie Uhrzeit (30-Minuten-Slot).');
-      return;
+
+    const errors: {
+      name?: string;
+      email?: string;
+      phone?: string;
+      treatment?: string;
+      date?: string;
+      slot?: string;
+      consent?: string;
+    } = {};
+
+    // 1. Name validation
+    if (!clientName.trim() || clientName.trim().length < 2) {
+      errors.name = 'Bitte geben Sie Ihren vollständigen Vor- und Nachnamen an.';
     }
+
+    // 2. Email validation (RFC format check)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!clientEmail.trim() || !emailRegex.test(clientEmail.trim())) {
+      errors.email = 'Bitte geben Sie eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de).';
+    }
+
+    // 3. Phone validation (optional - nur prüfen, falls angegeben)
+    if (clientPhone.trim().length > 0) {
+      const digitsOnly = clientPhone.replace(/\D/g, '');
+      if (digitsOnly.length < 6) {
+        errors.phone = 'Bitte geben Sie eine gültige Telefonnummer an oder lassen Sie das Feld leer.';
+      }
+    }
+
+    // 4. Treatment validation
     if (!isZoneSelectionValid) {
-      setFormError(`Bitte wähle genau ${zoneCount} Zone(n) für deine Behandlung aus.`);
+      errors.treatment = `Bitte wählen Sie genau ${zoneCount} Zone(n) für Ihre Behandlung aus.`;
+    }
+
+    // 5. Date validation (must not be in the past)
+    if (!selectedDay) {
+      errors.date = 'Bitte wählen Sie einen Behandlungstag im Kalender aus.';
+    } else if (isPastDay(selectedDay)) {
+      errors.date = 'Das gewählte Datum darf nicht in der Vergangenheit liegen.';
+    }
+
+    // 6. Slot validation
+    if (!selectedSlot) {
+      errors.slot = 'Bitte wählen Sie eine Uhrzeit bzw. ein Zeitfenster aus.';
+    }
+
+    // 7. Privacy consent validation
+    if (!consentGiven) {
+      errors.consent = 'Bitte willigen Sie in die Datenverarbeitung zur Bearbeitung Ihrer Anfrage ein.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
       return;
     }
-    if (!clientName.trim()) {
-      setFormError('Bitte gib deinen vollständigen Namen an.');
-      return;
-    }
-    if (!clientEmail.trim() || !clientEmail.includes('@')) {
-      setFormError('Bitte gib eine gültige E-Mail-Adresse an.');
-      return;
-    }
-    if (!clientPhone.trim()) {
-      setFormError('Bitte gib eine Telefonnummer für Rückfragen an.');
-      return;
-    }
+
+    setFieldErrors({});
 
     const selectedTreatmentNames: string[] = [];
     if (treatmentType === 'zones') {
@@ -232,12 +318,13 @@ export const BookingTool: React.FC = () => {
 
     const treatmentText = selectedTreatmentNames.join(', ');
     const dateText = formattedSelectedDate || '';
-    const slotText = selectedSlot;
+    const dateIso = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+    const slotText = selectedSlot || '';
 
     setIsSubmitting(true);
 
     try {
-      // Serverseitige Verarbeitung und Versand per Gmail
+      // Serverseitige Verarbeitung und E-Mail-Versand
       const res = await fetch('/api/appointments', {
         method: 'POST',
         headers: {
@@ -249,14 +336,18 @@ export const BookingTool: React.FC = () => {
           phone: clientPhone.trim(),
           treatment: treatmentText,
           date: dateText,
+          dateIso,
           slot: slotText,
+          contactPreference,
           notes: clientNotes.trim(),
+          consent: consentGiven,
+          hp_field: honeypot,
         }),
       });
 
       const result = await res.json();
       if (!res.ok) {
-        throw new Error(result.error || 'Terminanfrage konnte nicht übermittelt werden.');
+        throw new Error(result.error || 'Ihre Anfrage konnte nicht verarbeitet werden.');
       }
 
       setConfirmationData({
@@ -266,13 +357,19 @@ export const BookingTool: React.FC = () => {
         treatment: treatmentText,
         date: dateText,
         slot: slotText,
+        contactPreference,
+        notes: clientNotes.trim(),
         emailSent: result.emailSent,
       });
 
       setIsSubmitted(true);
     } catch (err: any) {
-      console.error('Fehler beim Absenden der Buchung:', err);
-      setSubmitError(err.message || 'Die Terminanfrage konnte leider nicht übermittelt werden. Bitte versuche es erneut.');
+      console.error('Fehler beim Absenden der Terminanfrage:', err);
+      // Strictly do not show false success message
+      setSubmitError(
+        err.message ||
+          'Die Terminanfrage konnte per E-Mail leider nicht übermittelt werden. Bitte versuchen Sie es erneut oder rufen Sie uns direkt an.'
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -282,7 +379,7 @@ export const BookingTool: React.FC = () => {
     setIsSubmitted(false);
     setIsModalOpen(false);
     setSelectedSlot(null);
-    setFormError(null);
+    setFieldErrors({});
     setSubmitError(null);
   };
 
@@ -553,8 +650,10 @@ export const BookingTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={handlePrevMonth}
-                    className="p-2 rounded-full border border-[#E9DDDB] text-[#775B5D] hover:bg-[#D8C4C2]/20 focus:outline-none transition-colors"
+                    disabled={!canGoPrevMonth}
+                    className="p-2 rounded-full border border-[#E9DDDB] text-[#775B5D] hover:bg-[#D8C4C2]/20 focus:outline-none transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     aria-label="Vorheriger Monat"
+                    title={!canGoPrevMonth ? 'Vergangene Monate können nicht ausgewählt werden' : 'Vorheriger Monat'}
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -591,8 +690,21 @@ export const BookingTool: React.FC = () => {
 
                 {Array.from({ length: daysInMonth }).map((_, idx) => {
                   const dayNum = idx + 1;
+                  const isPast = isPastDay(dayNum);
                   const avail = getDayAvailability(viewYear, viewMonth, dayNum);
                   const isSelected = selectedDay === dayNum;
+
+                  if (isPast) {
+                    return (
+                      <div
+                        key={dayNum}
+                        title="Vergangenes Datum nicht buchbar"
+                        className="h-10 sm:h-11 rounded-lg flex items-center justify-center text-xs text-[#3E3335]/25 bg-transparent cursor-not-allowed select-none"
+                      >
+                        {dayNum}
+                      </div>
+                    );
+                  }
 
                   if (avail.isWeekend) {
                     return (
@@ -612,6 +724,9 @@ export const BookingTool: React.FC = () => {
                       onClick={() => {
                         setSelectedDay(dayNum);
                         setSelectedSlot(null);
+                        if (fieldErrors.date) {
+                          setFieldErrors((prev) => ({ ...prev, date: undefined }));
+                        }
                       }}
                       className={`relative h-10 sm:h-11 rounded-lg flex flex-col items-center justify-center text-xs font-medium transition-all ${
                         isSelected
@@ -650,7 +765,7 @@ export const BookingTool: React.FC = () => {
                   <span className="text-xs font-medium text-[#775B5D]">
                     {formattedSelectedDate
                       ? `Freie 30-Minuten-Slots für ${formattedSelectedDate}`
-                      : 'Bitte wähle einen Tag im Kalender'}
+                      : 'Bitte wählen Sie einen Tag im Kalender'}
                   </span>
                 </div>
 
@@ -663,7 +778,7 @@ export const BookingTool: React.FC = () => {
                           key={slot}
                           type="button"
                           onClick={() => handleSelectSlot(slot)}
-                          className={`py-2.5 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all ${
+                          className={`py-2.5 px-3 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                             isSlotSelected
                               ? 'bg-[#775B5D] text-[#FBF8F6] shadow-xs'
                               : 'bg-[#FBF8F6] border border-[#E9DDDB] text-[#3E3335] hover:border-[#775B5D] hover:bg-[#FBF8F6]'
@@ -677,7 +792,7 @@ export const BookingTool: React.FC = () => {
                   </div>
                 ) : (
                   <div className="p-6 rounded-xl bg-[#FBF8F6] border border-[#D69292]/40 text-xs text-[#775B5D] text-center">
-                    An diesem Tag sind leider keine freien Termine verfügbar. Bitte wähle einen Tag mit grünem Punkt.
+                    An diesem Tag sind leider keine freien Termine verfügbar. Bitte wählen Sie einen Tag mit grünem Punkt.
                   </div>
                 )}
               </div>
@@ -691,7 +806,7 @@ export const BookingTool: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(true)}
-                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium hover:bg-[#3E3335] transition-colors"
+                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
                   >
                     Angaben eingeben
                   </button>
@@ -706,7 +821,7 @@ export const BookingTool: React.FC = () => {
           <div
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#3E3335]/50 backdrop-blur-xs overflow-y-auto"
             onClick={(e) => {
-              if (e.target === e.currentTarget) {
+              if (e.target === e.currentTarget && !isSubmitting) {
                 setIsModalOpen(false);
               }
             }}
@@ -714,12 +829,13 @@ export const BookingTool: React.FC = () => {
             aria-modal="true"
             aria-labelledby="modal-step3-title"
           >
-            <div className="relative w-full max-w-lg bg-[#FBF8F6] rounded-3xl border border-[#E9DDDB] shadow-2xl p-6 sm:p-8 my-8 text-[#3E3335] animate-in fade-in zoom-in-95 duration-200">
+            <div className="relative w-full max-w-lg bg-[#FBF8F6] rounded-3xl border border-[#E9DDDB] shadow-2xl p-6 sm:p-8 my-8 text-[#3E3335] animate-in fade-in zoom-in-95 duration-200 max-h-[90vh] overflow-y-auto">
               {/* Schließen Button */}
               <button
                 type="button"
+                disabled={isSubmitting}
                 onClick={() => setIsModalOpen(false)}
-                className="absolute top-5 right-5 p-2 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 hover:text-[#3E3335] transition-colors focus:outline-none"
+                className="absolute top-5 right-5 p-2 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 hover:text-[#3E3335] transition-colors focus:outline-none disabled:opacity-40 cursor-pointer"
                 aria-label="Fenster schließen"
               >
                 <X className="w-5 h-5" />
@@ -727,26 +843,54 @@ export const BookingTool: React.FC = () => {
 
               {!isSubmitted ? (
                 <>
-                  <div className="mb-6 pr-8">
+                  <div className="mb-5 pr-8">
                     <span className="text-xs font-mono text-[#B99A99] uppercase tracking-wider block mb-1">
                       Schritt 3
                     </span>
                     <h3 id="modal-step3-title" className="font-serif text-2xl sm:text-3xl text-[#3E3335]">
-                      Deine Kontaktdaten
+                      Terminanfrage absenden
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#775B5D] mt-1">
-                      Für deinen Wunschtermin am <span className="font-semibold text-[#3E3335]">{formattedSelectedDate} um {selectedSlot} Uhr</span>.
-                    </p>
+                    <div className="mt-2.5 p-3 rounded-xl bg-[#E9DDDB]/30 border border-[#E9DDDB] text-xs space-y-1 text-[#775B5D]">
+                      <div>
+                        <span className="font-medium text-[#3E3335]">Wunschtermin:</span>{' '}
+                        <span>{formattedSelectedDate} um {selectedSlot} Uhr</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-[#3E3335]">Behandlung:</span>{' '}
+                        <span>
+                          {treatmentType === 'zones'
+                            ? `Botox ${zoneCount} Zone(n)`
+                            : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  {(formError || submitError) && (
-                    <div className="mb-4 p-3.5 rounded-xl bg-[#D69292]/15 border border-[#D69292] text-xs text-[#775B5D] flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 shrink-0 text-[#775B5D]" />
-                      <span>{formError || submitError}</span>
+                  {submitError && (
+                    <div className="mb-4 p-3.5 rounded-xl bg-[#D69292]/20 border border-[#D69292] text-xs text-[#775B5D] flex items-start gap-2.5">
+                      <AlertCircle className="w-4 h-4 shrink-0 text-[#C45E5E] mt-0.5" />
+                      <div>
+                        <p className="font-medium text-[#3E3335] mb-0.5">Übermittlung fehlgeschlagen</p>
+                        <p>{submitError}</p>
+                      </div>
                     </div>
                   )}
 
                   <form onSubmit={handleSubmitBooking} className="space-y-4">
+                    {/* Unsichtbares Honeypot-Feld gegen Spam-Bots */}
+                    <div className="hidden" aria-hidden="true">
+                      <label htmlFor="hp_field">Bitte dieses Feld freilassen</label>
+                      <input
+                        type="text"
+                        id="hp_field"
+                        name="hp_field"
+                        value={honeypot}
+                        onChange={(e) => setHoneypot(e.target.value)}
+                        tabIndex={-1}
+                        autoComplete="off"
+                      />
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-medium text-[#3E3335] mb-1">
@@ -757,11 +901,23 @@ export const BookingTool: React.FC = () => {
                           required
                           disabled={isSubmitting}
                           value={clientName}
-                          onChange={(e) => setClientName(e.target.value)}
+                          onChange={(e) => {
+                            setClientName(e.target.value);
+                            if (fieldErrors.name) setFieldErrors((prev) => ({ ...prev, name: undefined }));
+                          }}
                           placeholder="z. B. Sophie Weber"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
+                          className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
+                            fieldErrors.name ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
+                          }`}
                         />
+                        {fieldErrors.name && (
+                          <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3 shrink-0" />
+                            {fieldErrors.name}
+                          </p>
+                        )}
                       </div>
+
                       <div>
                         <label className="block text-xs font-medium text-[#3E3335] mb-1">
                           E-Mail-Adresse *
@@ -771,51 +927,132 @@ export const BookingTool: React.FC = () => {
                           required
                           disabled={isSubmitting}
                           value={clientEmail}
-                          onChange={(e) => setClientEmail(e.target.value)}
-                          placeholder="deine.email@beispiel.de"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
+                          onChange={(e) => {
+                            setClientEmail(e.target.value);
+                            if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+                          }}
+                          placeholder="ihre.email@beispiel.de"
+                          className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
+                            fieldErrors.email ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
+                          }`}
                         />
+                        {fieldErrors.email && (
+                          <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
+                            <AlertCircle className="w-3 h-3 shrink-0" />
+                            {fieldErrors.email}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-medium text-[#3E3335] mb-1">
-                        Telefonnummer *
+                        Telefonnummer (optional)
                       </label>
                       <input
                         type="tel"
-                        required
                         disabled={isSubmitting}
                         value={clientPhone}
-                        onChange={(e) => setClientPhone(e.target.value)}
-                        placeholder="0173 1234567"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
+                        onChange={(e) => {
+                          setClientPhone(e.target.value);
+                          if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+                        }}
+                        placeholder="z. B. 0152 33979650"
+                        className={`w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60 transition-colors ${
+                          fieldErrors.phone ? 'border-[#C45E5E] bg-[#D69292]/10' : 'border-[#E9DDDB]'
+                        }`}
                       />
+                      {fieldErrors.phone && (
+                        <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {fieldErrors.phone}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Optionale bevorzugte Kontaktart */}
+                    <div>
+                      <label className="block text-xs font-medium text-[#3E3335] mb-1.5">
+                        Bevorzugte Kontaktart (optional)
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {['E-Mail', 'Telefonanruf', 'WhatsApp / SMS', 'Keine Präferenz'].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            disabled={isSubmitting}
+                            onClick={() => setContactPreference(opt)}
+                            className={`py-2 px-2 text-xs rounded-xl border text-center transition-all cursor-pointer ${
+                              contactPreference === opt
+                                ? 'bg-[#775B5D] border-[#775B5D] text-[#FBF8F6] font-medium'
+                                : 'bg-[#FBF8F6] border-[#E9DDDB] text-[#3E3335] hover:border-[#775B5D]/60'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-medium text-[#3E3335] mb-1">
-                        Fragen oder persönliche Wünsche (optional)
+                        Nachricht / Anmerkungen (optional)
                       </label>
                       <textarea
                         rows={2}
                         disabled={isSubmitting}
                         value={clientNotes}
                         onChange={(e) => setClientNotes(e.target.value)}
-                        placeholder="Gibt es etwas, worauf wir besonders achten dürfen?"
+                        placeholder="Gibt es etwas, worauf wir besonders achten dürfen oder Fragen zur Behandlung?"
                         className="w-full px-3.5 py-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
                       />
                     </div>
 
-                    <p className="text-[11px] text-[#775B5D]/80 italic pt-1">
-                      Es findet keine Online-Zahlung statt. Deine Anfrage wird vertraulich und sicher an die Praxis übermittelt.
-                    </p>
+                    {/* Datenschutz Einwilligung Checkbox */}
+                    <div className="pt-1">
+                      <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={consentGiven}
+                          disabled={isSubmitting}
+                          onChange={(e) => {
+                            setConsentGiven(e.target.checked);
+                            if (fieldErrors.consent) setFieldErrors((prev) => ({ ...prev, consent: undefined }));
+                          }}
+                          className="mt-0.5 h-4 w-4 rounded border-[#E9DDDB] text-[#775B5D] focus:ring-[#775B5D] cursor-pointer"
+                        />
+                        <span className="text-[11px] text-[#775B5D] leading-relaxed">
+                          Ich willige ein, dass meine Daten zur Bearbeitung und Beantwortung meiner Terminanfrage verarbeitet werden. Hinweis: Sie können Ihre Einwilligung jederzeit für die Zukunft widerrufen. Weitere Informationen finden Sie in der{' '}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setShowPrivacyModal(true);
+                            }}
+                            className="text-[#3E3335] underline font-medium hover:text-[#775B5D] cursor-pointer"
+                          >
+                            Datenschutzerklärung
+                          </button>
+                          .*
+                        </span>
+                      </label>
+                      {fieldErrors.consent && (
+                        <p className="text-[11px] text-[#C45E5E] mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 shrink-0" />
+                          {fieldErrors.consent}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="text-[11px] text-[#775B5D]/80 bg-[#E9DDDB]/20 p-2.5 rounded-xl border border-[#E9DDDB]/60 leading-relaxed">
+                      Dies ist eine unverbindliche Terminanfrage. Der Termin ist erst nach unserer Bestätigung fest vereinbart. Es findet keine Vorauszahlung statt.
+                    </div>
 
                     <button
                       id="submit-booking-btn"
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-4 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-75 cursor-pointer disabled:cursor-not-allowed"
+                      className="w-full py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-75 cursor-pointer disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? (
                         <>
@@ -825,64 +1062,150 @@ export const BookingTool: React.FC = () => {
                       ) : (
                         <>
                           <Send className="w-4 h-4 text-[#D8C4C2]" />
-                          <span>Termin verbindlich anfragen</span>
+                          <span>Termin anfragen</span>
                         </>
                       )}
                     </button>
                   </form>
                 </>
               ) : (
-                /* Verständliche Bestätigung auf der Website */
-                <div className="py-6 text-center space-y-4">
+                /* Verständliche Bestätigung auf der Website (gemäß Anforderung 9) */
+                <div className="py-4 text-center space-y-4">
                   <div className="w-14 h-14 rounded-full bg-[#A8C6B0]/30 border border-[#A8C6B0] flex items-center justify-center mx-auto text-[#775B5D]">
                     <CheckCircle2 className="w-8 h-8 text-[#775B5D]" />
                   </div>
 
-                  <h3 className="font-serif text-2xl text-[#3E3335]">
-                    Terminanfrage erfolgreich übermittelt!
-                  </h3>
-
-                  <p className="text-sm text-[#3E3335]/90 font-light leading-relaxed max-w-md mx-auto">
-                    Vielen Dank, <strong className="font-medium text-[#3E3335]">{confirmationData?.name}</strong>. Deine Anfrage wurde sicher an die Praxis übermittelt.
-                  </p>
+                  <div className="space-y-1.5">
+                    <h3 className="font-serif text-2xl text-[#3E3335]">
+                      Vielen Dank für Ihre Anfrage.
+                    </h3>
+                    <p className="text-sm text-[#3E3335]/90 font-light leading-relaxed max-w-md mx-auto">
+                      Wir haben Ihre Terminanfrage erhalten und melden uns schnellstmöglich bei Ihnen.
+                    </p>
+                  </div>
 
                   {/* Zusammenfassung der Daten */}
-                  <div className="bg-[#FBF8F6] border border-[#E9DDDB] rounded-xl p-4 text-left text-xs text-[#3E3335] space-y-1.5 max-w-md mx-auto">
+                  <div className="bg-[#FBF8F6] border border-[#E9DDDB] rounded-2xl p-4 text-left text-xs text-[#3E3335] space-y-2 max-w-md mx-auto">
+                    <div className="font-medium text-[#775B5D] border-b border-[#E9DDDB] pb-1 uppercase tracking-wider text-[10px]">
+                      Zusammenfassung Ihrer Terminanfrage
+                    </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
-                      <span className="text-[#775B5D] font-medium">Gewählte Behandlung:</span>
+                      <span className="text-[#775B5D]">Name:</span>
+                      <span className="font-medium text-right">{confirmationData?.name}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D]">E-Mail-Adresse:</span>
+                      <span className="font-medium text-right">{confirmationData?.email}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D]">Telefonnummer:</span>
+                      <span className="font-medium text-right">
+                        {confirmationData?.phone ? confirmationData.phone : 'Nicht angegeben'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D]">Behandlung:</span>
                       <span className="font-medium text-right">{confirmationData?.treatment}</span>
                     </div>
                     <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
-                      <span className="text-[#775B5D] font-medium">Wunschtermin:</span>
-                      <span>{confirmationData?.date} um {confirmationData?.slot} Uhr</span>
+                      <span className="text-[#775B5D]">Wunschtermin:</span>
+                      <span className="font-medium text-right">{confirmationData?.date} um {confirmationData?.slot} Uhr</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-[#775B5D] font-medium">Telefonnummer:</span>
-                      <span>{confirmationData?.phone}</span>
-                    </div>
+                    {confirmationData?.contactPreference && (
+                      <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                        <span className="text-[#775B5D]">Bevorzugte Kontaktart:</span>
+                        <span className="font-medium text-right">{confirmationData.contactPreference}</span>
+                      </div>
+                    )}
+                    {confirmationData?.notes && (
+                      <div className="pt-1 text-[11px] text-[#775B5D]">
+                        <span className="font-medium text-[#3E3335] block mb-0.5">Ihre Nachricht / Anmerkungen:</span>
+                        <span className="italic">{confirmationData.notes}</span>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Verständlicher Bestätigungshinweis für den Kunden */}
-                  <div className="p-3.5 bg-[#A8C6B0]/20 border border-[#A8C6B0] rounded-xl text-xs text-[#3E3335] max-w-md mx-auto leading-relaxed text-left">
-                    <p className="font-medium text-[#775B5D] mb-1">
-                      Bestätigungs-E-Mail versendet:
+                  {/* Klarer Hinweis zur Unverbindlichkeit & Eingangsbestätigung */}
+                  <div className="p-3.5 bg-[#A8C6B0]/20 border border-[#A8C6B0] rounded-xl text-xs text-[#3E3335] max-w-md mx-auto leading-relaxed text-left space-y-1">
+                    <p className="font-medium text-[#775B5D] flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5" />
+                      Hinweis zur Terminvereinbarung:
                     </p>
-                    <p className="text-[#3E3335]/90">
-                      Eine Bestätigung deiner Angaben wurde an <strong>{confirmationData?.email}</strong> gesendet. Dr. Milena Philippi und das Team prüfen deinen Terminwunsch zeitnah und melden sich schnellstmöglich bei dir.
+                    <p className="text-[#3E3335]/90 text-[11px]">
+                      Bitte beachten Sie: Dies ist eine unverbindliche Terminanfrage. Der Termin ist erst nach unserer persönlichen Bestätigung durch die Praxis verbindlich vereinbart.
+                    </p>
+                    <p className="text-[#3E3335]/90 text-[11px] pt-1">
+                      Eine Eingangsbestätigung wurde an <strong>{confirmationData?.email}</strong> gesendet.
                     </p>
                   </div>
 
-                  <div className="pt-3">
+                  <div className="pt-2">
                     <button
                       type="button"
                       onClick={resetBooking}
-                      className="px-8 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors"
+                      className="px-8 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
                     >
-                      Fertig / Schließen
+                      Schließen
                     </button>
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* MODAL: DATENSCHUTZERKLÄRUNG HINWEIS */}
+        {showPrivacyModal && (
+          <div
+            className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-[#3E3335]/60 backdrop-blur-xs"
+            onClick={() => setShowPrivacyModal(false)}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              className="relative w-full max-w-md bg-[#FBF8F6] rounded-2xl border border-[#E9DDDB] shadow-2xl p-6 text-[#3E3335] animate-in fade-in zoom-in-95 duration-150"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between pb-3 mb-3 border-b border-[#E9DDDB]">
+                <h4 className="font-serif text-lg text-[#3E3335] flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-[#775B5D]" />
+                  Datenschutzhinweis zur Terminanfrage
+                </h4>
+                <button
+                  type="button"
+                  onClick={() => setShowPrivacyModal(false)}
+                  className="p-1 rounded-full text-[#775B5D] hover:bg-[#E9DDDB]/50 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="text-xs text-[#775B5D] space-y-2.5 leading-relaxed">
+                <p>
+                  Mit dem Absenden des Formulars willigen Sie ein, dass PHI Aesthetics (Dr. med. Milena Philippi) Ihre eingegebenen Daten (Name, E-Mail-Adresse, Telefonnummer, gewählte Behandlung, Wunschzeit und Anmerkungen) verarbeitet.
+                </p>
+                <p>
+                  <strong>Zweck:</strong> Die Datenverarbeitung erfolgt ausschließlich zur Bearbeitung, Koordinierung und Beantwortung Ihrer Terminanfrage (Art. 6 Abs. 1 lit. b und a DSGVO).
+                </p>
+                <p>
+                  <strong>Speicherung & Weitergabe:</strong> Ihre Daten werden vertraulich behandelt und nicht an unbefugte Dritte weitergegeben.
+                </p>
+                <p>
+                  <strong>Widerrufsrecht:</strong> Sie können Ihre erteilte Einwilligung jederzeit mit Wirkung für die Zukunft per E-Mail an{' '}
+                  <a href="mailto:info.phiaesthetics@gmail.com" className="underline font-medium text-[#3E3335]">
+                    info.phiaesthetics@gmail.com
+                  </a>{' '}
+                  widerrufen.
+                </p>
+              </div>
+              <div className="mt-5 pt-3 border-t border-[#E9DDDB] text-right">
+                <button
+                  type="button"
+                  onClick={() => setShowPrivacyModal(false)}
+                  className="px-5 py-2 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium hover:bg-[#3E3335] transition-colors cursor-pointer"
+                >
+                  Verstanden
+                </button>
+              </div>
             </div>
           </div>
         )}
