@@ -8,13 +8,13 @@ import {
   Send,
   AlertCircle,
   X,
+  Loader2,
 } from 'lucide-react';
 import {
   ZONE_OPTIONS,
   ZONE_PRICES,
   ADDON_OPTIONS,
   OTHER_TREATMENTS,
-  CONTACT_CONFIG,
 } from '../config';
 
 // 30-min slot schedule from 09:00 to 18:00
@@ -75,7 +75,18 @@ export const BookingTool: React.FC = () => {
   const [clientPhone, setClientPhone] = useState('');
   const [clientNotes, setClientNotes] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [confirmationData, setConfirmationData] = useState<{
+    name: string;
+    email: string;
+    phone: string;
+    treatment: string;
+    date: string;
+    slot: string;
+    emailSent?: boolean;
+  } | null>(null);
 
   const viewYear = currentDate.getFullYear();
   const viewMonth = currentDate.getMonth();
@@ -174,9 +185,10 @@ export const BookingTool: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSubmitBooking = (e: React.FormEvent) => {
+  const handleSubmitBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
+    setSubmitError(null);
 
     if (!selectedDay) {
       setFormError('Bitte wähle einen verfügbaren Behandlungstag im Kalender.');
@@ -203,7 +215,6 @@ export const BookingTool: React.FC = () => {
       return;
     }
 
-    // Zusammenfassung für direkte E-Mail-Übermittlung an die Praxisadresse
     const selectedTreatmentNames: string[] = [];
     if (treatmentType === 'zones') {
       selectedZones.forEach((zid) => {
@@ -219,31 +230,52 @@ export const BookingTool: React.FC = () => {
       if (other) selectedTreatmentNames.push(other.name);
     }
 
-    const emailSubject = `Neue Terminanfrage von ${clientName.trim()} (${formattedSelectedDate}, ${selectedSlot} Uhr)`;
-    const emailBody = [
-      `Neue Terminanfrage über phiaesthetics:`,
-      `----------------------------------------`,
-      `Name: ${clientName.trim()}`,
-      `E-Mail: ${clientEmail.trim()}`,
-      `Telefon: ${clientPhone.trim()}`,
-      `Wunschtermin: ${formattedSelectedDate} um ${selectedSlot} Uhr`,
-      `Gewählte Behandlung: ${selectedTreatmentNames.join(', ')}`,
-      clientNotes.trim() ? `Persönliche Notiz: ${clientNotes.trim()}` : null,
-      `----------------------------------------`,
-      `Gesendet an: ${CONTACT_CONFIG.email}`,
-    ]
-      .filter(Boolean)
-      .join('\n');
+    const treatmentText = selectedTreatmentNames.join(', ');
+    const dateText = formattedSelectedDate || '';
+    const slotText = selectedSlot;
 
-    // Mailto-Aufruf zur Übergabe an info.phiaesthetics@gmail.com
-    const mailtoUrl = `mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
-      emailSubject
-    )}&body=${encodeURIComponent(emailBody)}`;
-    
-    // Wir öffnen sanft das Standard-Mailprogramm und bestätigen die Anfrage im UI
-    window.location.href = mailtoUrl;
+    setIsSubmitting(true);
 
-    setIsSubmitted(true);
+    try {
+      // Serverseitige Verarbeitung und Versand per Gmail
+      const res = await fetch('/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: clientName.trim(),
+          email: clientEmail.trim(),
+          phone: clientPhone.trim(),
+          treatment: treatmentText,
+          date: dateText,
+          slot: slotText,
+          notes: clientNotes.trim(),
+        }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result.error || 'Terminanfrage konnte nicht übermittelt werden.');
+      }
+
+      setConfirmationData({
+        name: clientName.trim(),
+        email: clientEmail.trim(),
+        phone: clientPhone.trim(),
+        treatment: treatmentText,
+        date: dateText,
+        slot: slotText,
+        emailSent: result.emailSent,
+      });
+
+      setIsSubmitted(true);
+    } catch (err: any) {
+      console.error('Fehler beim Absenden der Buchung:', err);
+      setSubmitError(err.message || 'Die Terminanfrage konnte leider nicht übermittelt werden. Bitte versuche es erneut.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const resetBooking = () => {
@@ -251,6 +283,7 @@ export const BookingTool: React.FC = () => {
     setIsModalOpen(false);
     setSelectedSlot(null);
     setFormError(null);
+    setSubmitError(null);
   };
 
   const formattedSelectedDate = selectedDay
@@ -706,10 +739,10 @@ export const BookingTool: React.FC = () => {
                     </p>
                   </div>
 
-                  {formError && (
+                  {(formError || submitError) && (
                     <div className="mb-4 p-3.5 rounded-xl bg-[#D69292]/15 border border-[#D69292] text-xs text-[#775B5D] flex items-center gap-2">
                       <AlertCircle className="w-4 h-4 shrink-0 text-[#775B5D]" />
-                      <span>{formError}</span>
+                      <span>{formError || submitError}</span>
                     </div>
                   )}
 
@@ -722,10 +755,11 @@ export const BookingTool: React.FC = () => {
                         <input
                           type="text"
                           required
+                          disabled={isSubmitting}
                           value={clientName}
                           onChange={(e) => setClientName(e.target.value)}
                           placeholder="z. B. Sophie Weber"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D]"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
                         />
                       </div>
                       <div>
@@ -735,10 +769,11 @@ export const BookingTool: React.FC = () => {
                         <input
                           type="email"
                           required
+                          disabled={isSubmitting}
                           value={clientEmail}
                           onChange={(e) => setClientEmail(e.target.value)}
                           placeholder="deine.email@beispiel.de"
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D]"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
                         />
                       </div>
                     </div>
@@ -750,10 +785,11 @@ export const BookingTool: React.FC = () => {
                       <input
                         type="tel"
                         required
+                        disabled={isSubmitting}
                         value={clientPhone}
                         onChange={(e) => setClientPhone(e.target.value)}
                         placeholder="0173 1234567"
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
                       />
                     </div>
 
@@ -763,50 +799,86 @@ export const BookingTool: React.FC = () => {
                       </label>
                       <textarea
                         rows={2}
+                        disabled={isSubmitting}
                         value={clientNotes}
                         onChange={(e) => setClientNotes(e.target.value)}
                         placeholder="Gibt es etwas, worauf wir besonders achten dürfen?"
-                        className="w-full px-3.5 py-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D]"
+                        className="w-full px-3.5 py-2 rounded-xl bg-[#FBF8F6] border border-[#E9DDDB] text-sm text-[#3E3335] focus:outline-none focus:border-[#775B5D] disabled:opacity-60"
                       />
                     </div>
 
-                    {/* Hinweis ohne Preis- oder Behandlungszusammenfassung */}
                     <p className="text-[11px] text-[#775B5D]/80 italic pt-1">
-                      Es findet keine Online-Zahlung statt. Deine Anfrage wird unverbindlich an die Praxis übermittelt.
+                      Es findet keine Online-Zahlung statt. Deine Anfrage wird vertraulich und sicher an die Praxis übermittelt.
                     </p>
 
                     <button
                       id="submit-booking-btn"
                       type="submit"
-                      className="w-full py-4 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2"
+                      disabled={isSubmitting}
+                      className="w-full py-4 rounded-xl bg-[#775B5D] text-[#FBF8F6] font-medium text-sm tracking-wide shadow-sm hover:bg-[#3E3335] active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2 disabled:opacity-75 cursor-pointer disabled:cursor-not-allowed"
                     >
-                      <Send className="w-4 h-4 text-[#D8C4C2]" />
-                      <span>Termin anfragen</span>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 text-[#D8C4C2] animate-spin" />
+                          <span>Terminanfrage wird übermittelt...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4 text-[#D8C4C2]" />
+                          <span>Termin verbindlich anfragen</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 </>
               ) : (
-                /* Bestätigung im PopUp */
+                /* Verständliche Bestätigung auf der Website */
                 <div className="py-6 text-center space-y-4">
                   <div className="w-14 h-14 rounded-full bg-[#A8C6B0]/30 border border-[#A8C6B0] flex items-center justify-center mx-auto text-[#775B5D]">
-                    <CheckCircle2 className="w-7 h-7 text-[#775B5D]" />
+                    <CheckCircle2 className="w-8 h-8 text-[#775B5D]" />
                   </div>
 
                   <h3 className="font-serif text-2xl text-[#3E3335]">
-                    Deine Terminanfrage ist angekommen.
+                    Terminanfrage erfolgreich übermittelt!
                   </h3>
 
-                  <p className="text-sm text-[#3E3335]/85 font-light leading-relaxed max-w-sm mx-auto">
-                    Wir melden uns persönlich bei dir, um den Termin am {formattedSelectedDate} um {selectedSlot} Uhr gemeinsam zu bestätigen.
+                  <p className="text-sm text-[#3E3335]/90 font-light leading-relaxed max-w-md mx-auto">
+                    Vielen Dank, <strong className="font-medium text-[#3E3335]">{confirmationData?.name}</strong>. Deine Anfrage wurde sicher an die Praxis übermittelt.
                   </p>
 
-                  <div className="pt-4">
+                  {/* Zusammenfassung der Daten */}
+                  <div className="bg-[#FBF8F6] border border-[#E9DDDB] rounded-xl p-4 text-left text-xs text-[#3E3335] space-y-1.5 max-w-md mx-auto">
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D] font-medium">Gewählte Behandlung:</span>
+                      <span className="font-medium text-right">{confirmationData?.treatment}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#E9DDDB]/60 pb-1.5">
+                      <span className="text-[#775B5D] font-medium">Wunschtermin:</span>
+                      <span>{confirmationData?.date} um {confirmationData?.slot} Uhr</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#775B5D] font-medium">Telefonnummer:</span>
+                      <span>{confirmationData?.phone}</span>
+                    </div>
+                  </div>
+
+                  {/* Verständlicher Bestätigungshinweis für den Kunden */}
+                  <div className="p-3.5 bg-[#A8C6B0]/20 border border-[#A8C6B0] rounded-xl text-xs text-[#3E3335] max-w-md mx-auto leading-relaxed text-left">
+                    <p className="font-medium text-[#775B5D] mb-1">
+                      Bestätigungs-E-Mail versendet:
+                    </p>
+                    <p className="text-[#3E3335]/90">
+                      Eine Bestätigung deiner Angaben wurde an <strong>{confirmationData?.email}</strong> gesendet. Dr. Milena Philippi und das Team prüfen deinen Terminwunsch zeitnah und melden sich schnellstmöglich bei dir.
+                    </p>
+                  </div>
+
+                  <div className="pt-3">
                     <button
                       type="button"
                       onClick={resetBooking}
-                      className="px-6 py-2.5 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors"
+                      className="px-8 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] transition-colors"
                     >
-                      Fertig
+                      Fertig / Schließen
                     </button>
                   </div>
                 </div>

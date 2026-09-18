@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { ArrowUp, X, Shield, FileText } from 'lucide-react';
+import { ArrowUp, X, Shield, FileText, Mail } from 'lucide-react';
 import { PhiLogo } from './PhiLogo';
 import { CONTACT_CONFIG } from '../config';
+import { GmailAdminModal } from './GmailAdminModal';
 
 export const Footer: React.FC = () => {
   const [activeLegalModal, setActiveLegalModal] = useState<'datenschutz' | 'impressum' | null>(
     null
   );
+  const [isGmailModalOpen, setIsGmailModalOpen] = useState(false);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -56,6 +58,14 @@ export const Footer: React.FC = () => {
               Impressum
             </button>
             <button
+              onClick={() => setIsGmailModalOpen(true)}
+              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline flex items-center gap-1 opacity-80 hover:opacity-100"
+              title="Praxis Gmail-Integration Status & Google-Anmeldung"
+            >
+              <Mail className="w-3.5 h-3.5" />
+              <span>Gmail-Status</span>
+            </button>
+            <button
               onClick={scrollToTop}
               className="p-2 rounded-full border border-[#E9DDDB] text-[#775B5D] hover:bg-[#D8C4C2]/20 transition-colors"
               aria-label="Zurück nach oben"
@@ -65,6 +75,12 @@ export const Footer: React.FC = () => {
           </div>
         </div>
       </footer>
+
+      {/* Praxis Gmail Integration Admin Modal */}
+      <GmailAdminModal
+        isOpen={isGmailModalOpen}
+        onClose={() => setIsGmailModalOpen(false)}
+      />
 
       {/* Kompakte, ruhige Hinweisbox für Datenschutz / Impressum */}
       {activeLegalModal && (
