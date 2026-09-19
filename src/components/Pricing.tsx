@@ -30,6 +30,24 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
           </p>
         </div>
 
+        {/* Spalte über die ganze Breite oberhalb der drei Spalten */}
+        <div
+          id="pricing-consultation-row"
+          className="mb-8 p-5 sm:p-6 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] shadow-xs flex items-center gap-4"
+        >
+          <div className="p-2.5 rounded-xl bg-[#E9DDDB]/40 text-[#775B5D] shrink-0">
+            <Info className="w-5 h-5" />
+          </div>
+          <p className="text-sm sm:text-base text-[#3E3335] leading-relaxed">
+            <span className="font-serif text-lg sm:text-xl font-medium text-[#3E3335] block sm:inline sm:mr-2">
+              Unverbindliche Erstberatung ab 30 €
+            </span>
+            <span className="text-[#775B5D] font-light">
+              – Bei Durchführung einer Behandlung ist die vorhergehende Beratung im Behandlungspreis inbegriffen.
+            </span>
+          </p>
+        </div>
+
         {/* Pricing Cards Structure aligned with Portfolio */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
           {/* Card 1: Zonenpreise */}
@@ -38,7 +56,7 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <span className="text-xs font-mono text-[#B99A99] block mb-2">
+              <span className="text-xs uppercase tracking-wider text-[#B99A99] block mb-2 font-medium">
                 Grundbehandlung
               </span>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-2">
@@ -59,7 +77,7 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#E9DDDB]">
                   <span className="text-sm font-medium text-[#3E3335]">3 Zonen</span>
-                  <span className="font-serif text-xl text-[#775B5D]">ab 360 €</span>
+                  <span className="font-serif text-xl text-[#775B5D]">ab 345 €</span>
                 </div>
               </div>
             </div>
@@ -77,7 +95,7 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <span className="text-xs font-mono text-[#B99A99] block mb-2">
+              <span className="text-xs uppercase tracking-wider text-[#B99A99] block mb-2 font-medium">
                 Ergänzungen
               </span>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-2">
@@ -115,7 +133,7 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <span className="text-xs font-mono text-[#B99A99] block mb-2">
+              <span className="text-xs uppercase tracking-wider text-[#B99A99] block mb-2 font-medium">
                 Spezifische Bereiche
               </span>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-2">

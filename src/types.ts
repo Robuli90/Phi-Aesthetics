@@ -3,9 +3,9 @@ export type SectionId =
   | 'dein-weg'
   | 'preise'
   | 'dr-milena'
+  | 'botulinumtoxin-verstehen'
   | 'botox-verstehen'
   | 'termin-buchen'
-  | 'phi-news'
   | 'kontakt';
 
 export interface NavItem {

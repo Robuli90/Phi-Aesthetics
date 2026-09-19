@@ -5,13 +5,27 @@ import { CONTACT_CONFIG } from '../config';
 
 interface ImpressumPageProps {
   onNavigateHome: () => void;
+  onNavigateDatenschutz?: () => void;
 }
 
-export const ImpressumPage: React.FC<ImpressumPageProps> = ({ onNavigateHome }) => {
+export const ImpressumPage: React.FC<ImpressumPageProps> = ({
+  onNavigateHome,
+  onNavigateDatenschutz,
+}) => {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
     document.title = 'Impressum | Dr. med. M. Philippi – Phi Aesthetics';
   }, []);
+
+  const handleDatenschutzClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (onNavigateDatenschutz) {
+      onNavigateDatenschutz();
+    } else {
+      window.history.pushState(null, '', '/datenschutz');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FBF8F6] text-[#3E3335] selection:bg-[#D8C4C2] selection:text-[#3E3335]">
@@ -208,15 +222,23 @@ export const ImpressumPage: React.FC<ImpressumPageProps> = ({ onNavigateHome }) 
             </div>
           </section>
 
-          {/* Bottom Navigation Button */}
-          <div className="pt-4 flex justify-center">
+          {/* Bottom Navigation Buttons */}
+          <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <button
               onClick={onNavigateHome}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] active:scale-[0.98] transition-all cursor-pointer shadow-sm"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#775B5D] text-[#FBF8F6] text-xs uppercase tracking-wider font-medium hover:bg-[#3E3335] active:scale-[0.98] transition-all cursor-pointer shadow-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Zurück zur Startseite</span>
             </button>
+            <a
+              href="/datenschutz"
+              onClick={handleDatenschutzClick}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full border border-[#D8C4C2] text-[#775B5D] hover:bg-[#E9DDDB]/40 text-xs uppercase tracking-wider font-medium active:scale-[0.98] transition-all cursor-pointer"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Zur Datenschutzerklärung</span>
+            </a>
           </div>
         </div>
       </main>
@@ -232,6 +254,14 @@ export const ImpressumPage: React.FC<ImpressumPageProps> = ({ onNavigateHome }) 
             >
               Startseite
             </button>
+            <span>•</span>
+            <a
+              href="/datenschutz"
+              onClick={handleDatenschutzClick}
+              className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline cursor-pointer"
+            >
+              Datenschutz
+            </a>
             <span>•</span>
             <a
               href="mailto:info.phiaesthetics@gmail.com?subject=Deine%20Anfrage%20an%20Phi%20Aesthetics"

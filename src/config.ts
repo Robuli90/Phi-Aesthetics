@@ -44,9 +44,8 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   { id: 'dein-weg', label: 'Dein Weg', href: '#dein-weg' },
   { id: 'preise', label: 'Transparente Preise', href: '#preise' },
   { id: 'dr-milena', label: 'Dr. Milena Philippi', href: '#dr-milena' },
-  { id: 'botox-verstehen', label: 'Botox verstehen', href: '#botox-verstehen' },
+  { id: 'botulinumtoxin-verstehen', label: 'Botulinumtoxin verstehen', href: '#botulinumtoxin-verstehen' },
   { id: 'termin-buchen', label: 'Termin finden', href: '#termin-buchen' },
-  { id: 'phi-news', label: 'Phi-News', href: '#phi-news' },
   { id: 'kontakt', label: 'Sprich mit uns', href: '#kontakt' },
 ];
 
@@ -59,7 +58,7 @@ export const ZONE_OPTIONS: ZoneOption[] = [
 export const ZONE_PRICES: Record<1 | 2 | 3, number> = {
   1: 160,
   2: 280,
-  3: 360,
+  3: 345,
 };
 
 export const ADDON_OPTIONS: AddonOption[] = [
@@ -75,15 +74,15 @@ export const OTHER_TREATMENTS: OtherTreatmentOption[] = [
   {
     id: 'masseter',
     name: 'Masseter',
-    priceLabel: 'ab 340 €',
-    basePrice: 340,
+    priceLabel: 'ab 350 €',
+    basePrice: 350,
     description: 'Gezielte Behandlung des Kaumuskels bei Bruxismus (Zähneknirschen) oder zur optischen Konturierung.',
   },
   {
     id: 'nefertiti',
     name: 'Nefertiti',
-    priceLabel: 'ab 340 €',
-    basePrice: 340,
+    priceLabel: 'ab 399 €',
+    basePrice: 399,
     description: 'Harmonische Definition der Kieferlinie und Entlastung des Platysmas am Hals.',
   },
   {
@@ -106,13 +105,8 @@ export const FAQ_DATA: FaqItem[] = [
   // 1. Grundlagen
   {
     category: 'grundlagen',
-    term: 'Botox',
-    explanation: 'Botox ist die geläufige Bezeichnung für eine medizinisch indizierte Behandlung mit Botulinumtoxin. Der Wirkstoff wird gezielt und individuell eingesetzt, um bestimmte Muskelaktivitäten vorübergehend zu reduzieren.',
-  },
-  {
-    category: 'grundlagen',
     term: 'Botulinumtoxin',
-    explanation: 'Ein bewährtes, gereinigtes Protein aus der medizinischen Praxis, das die Signalübertragung zwischen Nerv und Muskel vorübergehend hemmt.',
+    explanation: 'Ein bewährtes, gereinigtes Protein aus der medizinischen Praxis, das die Signalübertragung zwischen Nerv und Muskel vorübergehend hemmt. Der Wirkstoff wird gezielt und individuell eingesetzt, um bestimmte Muskelaktivitäten vorübergehend zu reduzieren.',
   },
   {
     category: 'grundlagen',
@@ -127,17 +121,17 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'grundlagen',
     term: 'Zone',
-    explanation: 'Eine Zone bezeichnet einen zuvor festgelegten Behandlungsbereich, zum Beispiel Glabella, Stirn oder laterale Augenwinkel.',
+    explanation: 'Eine Zone bezeichnet einen zuvor festgelegten Behandlungsbereich, zum Beispiel Glabella, Stirn oder laterale Augenwinkel. Bei allen Menschen bilden die Muskelgruppen des Gesichts ein individuelles Zusammenspiel. Oft ist es sinnvoll, mehr als eine Zone zu behandeln um ein gleichmäßiges und natürliches Ergebnis zu erzielen.',
   },
   {
     category: 'grundlagen',
-    term: 'Add-on',
-    explanation: 'Ein Add-on ist eine zusätzliche, kleinere und fein abgestimmte Behandlung, die zu einem Zonenpaket ergänzt werden kann.',
+    term: 'Add-ons',
+    explanation: 'Als Add-on bezeichnen wir bei Phi Aesthetis eine zusätzliche, kleinere und fein abgestimmte Behandlung, die zu einem Zonenpaket ergänzt werden kann. Sie alle haben in der Theorie eins gemeinsam: Mit nur wenig Intervention geben sie einem die Möglichkeit genau dort anzusetzen, wo man sich eine Veränderung wünscht.',
   },
   {
     category: 'grundlagen',
     term: 'Natürliches Ergebnis',
-    explanation: 'Ein Ergebnis, das deine natürliche Mimik bewahrt und Frische schenkt, statt ein maskenhaftes oder erstarrtes Aussehen zu erzeugen.',
+    explanation: 'Ein Ergebnis, das deine natürliche Mimik bewahrt und Frische schenkt, statt ein maskenhaftes oder erstarrtes Aussehen zu erzeugen. Im Gespräch gehen wir auf deine Vorstellungen ein und setzten gemeinsame Ziele für die Behandlung.',
   },
   {
     category: 'grundlagen',
@@ -149,17 +143,17 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'behandlungen',
     term: 'Glabella',
-    explanation: 'Die Glabella bezeichnet den Bereich zwischen den Augenbrauen, in dem sich häufig die sogenannte Zornesfalte zeigt.',
+    explanation: 'Die Glabella bezeichnet den Bereich zwischen den Augenbrauen, in dem sich häufig die sogenannte Zornesfalte zeigt. Eine ausgeprägte Aktivität der dortigen Muskulatur zieht die Augenbrauen nach innen und teilweise nach unten. Dadurch können sich mit der Zeit sichtbare Linien zwischen den Augenbrauen entwickeln, die zunehmend auch in Ruhe bestehen bleiben.\n\nDer Gesichtsausdruck kann dadurch angespannt, streng oder müde wirken – selbst wenn man sich eigentlich ganz anders fühlt.\n\nEine gezielte Behandlung mit Botulinumtoxin kann die Aktivität dieser Muskulatur reduzieren und so zu einem entspannteren und offeneren Ausdruck beitragen, ohne die natürliche Mimik vollständig auszuschalten.',
   },
   {
     category: 'behandlungen',
     term: 'Stirn',
-    explanation: 'Die Behandlung der horizontalen Stirnlinien sorgt für einen geglätteten, offenen und ausgeruhten Gesichtsausdruck unter Erhalt einer harmonischen Brauenbewegung.',
+    explanation: 'Die Stirnmuskulatur ist maßgeblich dafür verantwortlich, dass wir die Augenbrauen anheben. Dabei entstehen die typischen horizontalen Linien auf der Stirn.\n\nBei ausgeprägter Muskelaktivität können diese Stirnfalten zunehmend sichtbar werden und mit der Zeit auch in Ruhe bestehen bleiben. Der Gesichtsausdruck kann dadurch unruhiger oder angespannter wirken.\n\nEine gezielte Behandlung mit Botulinumtoxin kann die Muskelaktivität reduzieren und die Stirn dadurch glatter und entspannter erscheinen lassen. Dabei steht für mich ein natürliches Ergebnis im Vordergrund: Die Stirn soll nicht starr wirken, sondern ihre Ausdrucksfähigkeit möglichst bewahren.\n\nDa die Stirnmuskulatur gleichzeitig eine wichtige Rolle für die Position der Augenbrauen spielt, wird die Behandlung individuell an deine Mimik und Anatomie angepasst.\n\nHäufig bietet sich eine kombinierte Behandlung von Stirn und Glabella an. Der Grund: Während die Stirnmuskulatur die Augenbrauen anhebt, ziehen Muskeln im Bereich der Glabella die Brauen nach innen und unten. Wird ausschließlich die hebende Stirnmuskulatur entspannt, kann sich dieses Gleichgewicht verändern und die Augenbrauen können tiefer erscheinen. Durch eine individuell abgestimmte Behandlung beider Regionen lässt sich das Zusammenspiel der Muskulatur gezielter berücksichtigen.',
   },
   {
     category: 'behandlungen',
-    term: 'Laterale Augenwinkel',
-    explanation: 'Die feinen Linien seitlich der Augen, oft als Lachfalten oder Krähenfüße bezeichnet, werden sanft gemildert, ohne dem Lächeln seine Herzlichkeit zu nehmen.',
+    term: 'Laterale Augenwinkel / Krähenfüße',
+    explanation: 'Die feinen Linien seitlich der Augen, oft als Lachfalten oder Krähenfüße bezeichnet, entstehen durch die natürliche Aktivität der Augenmuskulatur und können mit der Zeit auch in Ruhe sichtbar bleiben. Durch eine gezielte Behandlung können sie sanft gemildert werden, ohne dem Lächeln dabei seine Herzlichkeit zu nehmen.',
   },
   {
     category: 'behandlungen',
@@ -169,7 +163,7 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'behandlungen',
     term: 'Lip Flip',
-    explanation: 'Bei einem Lip Flip wird die Wirkung im Bereich der Oberlippe sehr gezielt geplant. Ob diese Behandlung geeignet ist, hängt von der individuellen Anatomie und dem gewünschten Ergebnis ab.',
+    explanation: 'Deine Oberlippe wirkt beim Lächeln plötzlich schmaler oder „verschwindet“ ein Stück nach innen? Beim Lip Flip wird die Muskulatur am Oberlippenrand gezielt entspannt. Dadurch kann sich die Oberlippe leicht nach außen wenden und etwas voller und definierter erscheinen – ganz ohne zusätzliches Volumen durch Filler.',
   },
   {
     category: 'behandlungen',
@@ -194,12 +188,12 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'behandlungen',
     term: 'Masseter',
-    explanation: 'Bei der Behandlung der Masseter-Region wird der kräftige Kaumuskel betrachtet. Ziel und Eignung werden immer im persönlichen ärztlichen Gespräch geprüft – hilfreich bei Zähneknirschen und zur Gesichtsentspannung.',
+    explanation: 'Der Masseter ist ein kräftiger Kaumuskel, der beispielsweise bei starkem Zähnepressen oder -knirschen besonders ausgeprägt sein kann. Durch eine gezielte Behandlung kann seine Aktivität reduziert werden.\n\nNeben der Entspannung der Kaumuskulatur kann sich bei ausgeprägtem Masseter mit der Zeit auch das Erscheinungsbild der unteren Gesichtspartie verändern und schmaler wirken – häufig als „Face Slimming“ bezeichnet.\n\nOb die Behandlung aus funktionellen oder ästhetischen Gründen für dich geeignet ist, wird immer individuell im ärztlichen Gespräch geprüft.',
   },
   {
     category: 'behandlungen',
     term: 'Nefertiti',
-    explanation: 'Bezieht sich auf die Kieferkante und das Platysma am Hals, um der Kontur sanften Halt zu verleihen und die Kinnlinie optisch zu definieren.',
+    explanation: 'Seinen Namen verdankt der Nefertiti Lift der altägyptischen Königin Nofretete, deren berühmte Büste für ihren langen Hals und ihre klar definierte Kieferlinie bekannt ist.\n\nBei der Behandlung wird gezielt die nach unten ziehende Halsmuskulatur entspannt. Dadurch kann die Kieferlinie klarer definiert, die untere Gesichtskontur angehoben und der Übergang zum Hals harmonischer erscheinen.\n\nWie ausgeprägt der Effekt sein kann, hängt von deiner individuellen Anatomie und Muskelaktivität ab und wird im ärztlichen Gespräch beurteilt.',
   },
   {
     category: 'behandlungen',
@@ -221,7 +215,7 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'ablauf',
     term: 'Behandlung',
-    explanation: 'Die Injektionen erfolgen mit hauchfeinen Nadeln und dauern in der Regel nur 10 bis 20 Minuten. Sie sind schmerzarm und präzise abgestimmt.',
+    explanation: 'Die Injektionen erfolgen mit hauchfeinen Nadeln und dauern in der Regel nur 10 bis 20 Minuten. Sie sind schmerzarm und präzise abgestimmt. Bei empfindlicheren Regionen wie beispielsweise der Oberlippe (Lip-Flip) ist es möglich vorher eine schmerzlindernde Salbe aufzutragen.',
   },
   {
     category: 'ablauf',
@@ -268,7 +262,7 @@ export const FAQ_DATA: FaqItem[] = [
   {
     category: 'sicherheit',
     term: 'Seltene, behandlungsbedürftige Komplikationen',
-    explanation: 'Sehr selten kann es zu einem vorübergehenden Hängen des Augenlids (Ptosis) oder einer lokalen Infektion kommen. Bei ungewöhnlichen, starken Beschwerden sollte zeitnah ärztlicher Kontakt aufgenommen werden.',
+    explanation: 'Bei Phi Aesthetics nehmen wir uns im ärztlichen Gespräch Zeit, dich umfassend und verantwortungsvoll über mögliche Risiken und Nebenwirkungen aufzuklären.\n\nBotulinumtoxin wird seit vielen Jahren in der Medizin eingesetzt und ist auch in der ästhetischen Medizin gut etabliert. Wie bei jeder medizinischen Behandlung können jedoch Nebenwirkungen und Komplikationen auftreten. Welche individuellen Risiken bei deiner Behandlung bestehen, besprechen wir ausführlich vor dem Eingriff.',
   },
   {
     category: 'sicherheit',

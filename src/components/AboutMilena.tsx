@@ -31,7 +31,7 @@ export const AboutMilena: React.FC = () => {
               Approbierte Ärztin
             </span>
             <span className="px-3.5 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]">
-              Spezialisierung auf ästhetische Medizin
+              Fortbildung in der ästhetischen Anwendung von Botulinumtoxin
             </span>
             <span className="px-3.5 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]">
               Gründerin von Phi Aesthetics
@@ -51,7 +51,7 @@ export const AboutMilena: React.FC = () => {
           {/* Hervorgehobener, ruhiger Zitat-Block */}
           <div className="p-6 sm:p-8 rounded-2xl bg-[#E9DDDB]/35 border-l-4 border-[#775B5D] border-y border-r border-[#E9DDDB] relative">
             <blockquote className="font-serif text-lg sm:text-xl text-[#3E3335] italic leading-relaxed">
-              „Ich freue mich darauf zusammen mit Dir deine ästhetische Behandlung ganz individuell zu planen und durchzuführen und dabei voll und ganz auf deine Wünsche und Ziele einzugehen.“
+              „Ästhetik bedeutet für mich nicht, das Aussehen eines Menschen zu verändern, sonern das zu unterstreichen, was ihn ausmacht und womit er sich wohlfühlt.“
             </blockquote>
             <div className="mt-3 text-xs uppercase tracking-widest text-[#775B5D] font-medium">
               — Dr. Milena Philippi

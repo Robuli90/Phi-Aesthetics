@@ -1,8 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "Manrope", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: "Cormorant", Garamond, serif;
+  --font-sans: "EB Garamond", Garamond, serif;
+  --font-mono: "EB Garamond", Garamond, serif;
+  --font-cormorant: "Cormorant", Garamond, serif;
+  --font-garamond: "EB Garamond", Garamond, serif;
   
   --color-phi-bg: #FBF8F6;
   --color-phi-rose-light: #D8C4C2;
@@ -17,10 +20,11 @@
 
 :root {
   color-scheme: light;
+  font-family: "EB Garamond", Garamond, serif;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: "EB Garamond", Garamond, serif;
   background-color: #FBF8F6;
   color: #3E3335;
   margin: 0;
@@ -28,8 +32,38 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, .font-serif-cormorant {
-  font-family: var(--font-serif);
+/* All headings, display titles, and .font-serif are strictly Cormorant */
+h1, h2, h3, h4, h5, h6,
+.font-serif,
+.font-cormorant,
+.font-serif-cormorant {
+  font-family: "Cormorant", Garamond, serif !important;
+}
+
+/* Body text, paragraphs, buttons, navigation, inputs, textareas, selects, labels, footer, cards are strictly Garamond */
+body,
+p,
+span,
+a,
+button,
+input,
+textarea,
+select,
+label,
+li,
+td,
+th,
+footer,
+nav,
+.font-sans,
+.font-garamond {
+  font-family: "EB Garamond", Garamond, serif;
+}
+
+/* Ensure headings with nested spans/elements retain Cormorant */
+h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
+.font-serif * {
+  font-family: "Cormorant", Garamond, serif;
 }
 
 @media (prefers-reduced-motion: reduce) {

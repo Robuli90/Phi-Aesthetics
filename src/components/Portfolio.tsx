@@ -38,7 +38,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <div className="text-xs font-mono text-[#B99A99] mb-3">Kapitel 01</div>
+              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 01</div>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
                 Die drei oberen Gesichtszonen
               </h3>
@@ -74,7 +74,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <div className="text-xs font-mono text-[#B99A99] mb-3">Kapitel 02</div>
+              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 02</div>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
                 Deine Zonen – einzeln oder kombiniert
               </h3>
@@ -110,7 +110,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <div className="text-xs font-mono text-[#B99A99] mb-3">Kapitel 03</div>
+              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 03</div>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
                 Feine Ergänzungen
               </h3>
@@ -146,9 +146,9 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
             className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
           >
             <div>
-              <div className="text-xs font-mono text-[#B99A99] mb-3">Kapitel 04</div>
+              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 04</div>
               <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
-                Weitere Botoxbehandlungen
+                Weitere Botulinumtoxinbehandlungen
               </h3>
               <p className="text-sm text-[#3E3335]/80 font-light leading-relaxed mb-6">
                 Weitere Behandlungsmöglichkeiten, die einen persönlichen Beratungstermin und eine individuelle ärztliche Einschätzung voraussetzen.

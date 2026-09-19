@@ -11,7 +11,7 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
     'grundlagen' | 'behandlungen' | 'ablauf' | 'sicherheit'
   >(initialCategory);
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
-    Botox: true,
+    Botulinumtoxin: true,
     Glabella: true,
     Beratung: true,
     'Rötungen & Schwellungen': true,
@@ -43,10 +43,11 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
 
   return (
     <section
-      id="botox-verstehen"
+      id="botulinumtoxin-verstehen"
       className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
       aria-labelledby="faq-title"
     >
+      <div id="botox-verstehen" className="sr-only" aria-hidden="true" />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
@@ -57,7 +58,7 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
             id="faq-title"
             className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
           >
-            Botox verstehen
+            Botulinumtoxin verstehen
           </h2>
           <p className="text-base text-[#3E3335]/80 font-light max-w-xl mx-auto">
             Medizinisch verständlich erklärt: Antworten auf wichtige Fragen rund um Wirkungsweise, Zonen, Ablauf und Sicherheit.
@@ -135,8 +136,10 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
                 </button>
 
                 {isOpen && (
-                  <div className="px-6 pb-5 pt-1 text-sm text-[#3E3335]/85 leading-relaxed font-light border-t border-[#E9DDDB]/60 bg-[#FBF8F6]">
-                    {item.explanation}
+                  <div className="px-6 pb-5 pt-2 text-sm text-[#3E3335]/85 leading-relaxed font-light border-t border-[#E9DDDB]/60 bg-[#FBF8F6] space-y-3">
+                    {item.explanation.split('\n\n').map((paragraph, pIdx) => (
+                      <p key={pIdx}>{paragraph}</p>
+                    ))}
                   </div>
                 )}
               </div>

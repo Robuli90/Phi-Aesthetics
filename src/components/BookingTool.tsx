@@ -7,6 +7,7 @@ import {
   Calendar as CalendarIcon,
   Send,
   Mail,
+  MessageCircle,
   X,
   Info,
 } from 'lucide-react';
@@ -218,7 +219,7 @@ export const BookingTool: React.FC = () => {
       selectedTreatmentNames.length > 0
         ? selectedTreatmentNames.join(', ')
         : treatmentType === 'zones'
-        ? `Botox ${zoneCount} Zone(n)`
+        ? `Botulinumtoxin ${zoneCount} Zone(n)`
         : 'Behandlung';
 
     const dateText = formattedSelectedDate || '';
@@ -303,7 +304,7 @@ export const BookingTool: React.FC = () => {
                     : 'text-[#3E3335]/70 hover:text-[#3E3335]'
                 }`}
               >
-                Botox nach Zonen
+                Behandlung nach Zonen
               </button>
               <button
                 type="button"
@@ -534,24 +535,39 @@ export const BookingTool: React.FC = () => {
                     Terminbuchung in Kürze verfügbar
                   </h4>
                   <p className="text-sm sm:text-base text-[#3E3335] leading-relaxed font-light">
-                    Terminbuchungen werden in wenigen Tagen freigeschaltet. Bis dahin bitten wir Sie uns einfach eine Anfrage via Mail zu schicken.
+                    Terminbuchungen werden in wenigen Tagen freigeschaltet. Bis dahin bitten wir Dich uns einfach eine Anfrage via Mail oder WhatsApp zu schicken.
                   </p>
                 </div>
-                <div className="pt-2">
+                <div className="pt-2 flex flex-col items-stretch max-w-xs mx-auto gap-3">
                   <a
                     href={`mailto:${CONTACT_CONFIG.email}?subject=${encodeURIComponent(
                       'Deine Anfrage an Phi Aesthetics'
                     )}&body=${encodeURIComponent(
                       `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich interessiere mich für eine Behandlung bei Phi Aesthetics:\n\nBehandlung: ${
                         treatmentType === 'zones'
-                          ? `Botox ${zoneCount} Zone(n)`
+                          ? `Botulinumtoxin ${zoneCount} Zone(n)`
                           : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name || 'Behandlung'
                       }\n\nBitte gebt mir Bescheid, welche Termine verfügbar sind.\n\nViele Grüße`
                     )}`}
-                    className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium uppercase tracking-wider hover:bg-[#3E3335] transition-all shadow-sm cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-xl bg-[#775B5D] text-[#FBF8F6] text-xs font-medium uppercase tracking-wider hover:bg-[#3E3335] transition-all shadow-sm cursor-pointer"
                   >
                     <Mail className="w-4 h-4 text-[#D8C4C2]" />
                     <span>Anfrage via Mail schicken</span>
+                  </a>
+                  <a
+                    href={`https://wa.me/4915233979650?text=${encodeURIComponent(
+                      `Hallo Dr. Milena Philippi & Phi Aesthetics Team, ich interessiere mich für einen Behandlungstermin bei Phi Aesthetics (${
+                        treatmentType === 'zones'
+                          ? `Botulinumtoxin ${zoneCount} Zone(n)`
+                          : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name || 'Behandlung'
+                      }).`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 w-full px-6 py-3.5 rounded-xl bg-[#25D366] text-white text-xs font-medium uppercase tracking-wider hover:bg-[#1EBE5D] transition-all shadow-sm cursor-pointer"
+                  >
+                    <MessageCircle className="w-4 h-4 text-white" />
+                    <span>Anfrage via WhatsApp schicken</span>
                   </a>
                 </div>
               </div>
@@ -717,7 +733,7 @@ export const BookingTool: React.FC = () => {
                         )}&body=${encodeURIComponent(
                           `Hallo Dr. Milena Philippi & Phi Aesthetics Team,\n\nich interessiere mich für einen Termin rund um den ${formattedSelectedDate}.\n\nBehandlung: ${
                             treatmentType === 'zones'
-                              ? `Botox ${zoneCount} Zone(n)`
+                              ? `Botulinumtoxin ${zoneCount} Zone(n)`
                               : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name || 'Behandlung'
                           }\n\nBitte gebt mir Bescheid, welche Termine oder Ausweichmöglichkeiten verfügbar sind.\n\nViele Grüße`
                         )}`}
@@ -778,7 +794,7 @@ export const BookingTool: React.FC = () => {
               {!isSubmitted ? (
                 <>
                   <div className="mb-5 pr-8">
-                    <span className="text-xs font-mono text-[#B99A99] uppercase tracking-wider block mb-1">
+                    <span className="text-xs uppercase tracking-wider text-[#B99A99] font-medium block mb-1">
                       Schritt 3
                     </span>
                     <h3 id="modal-step3-title" className="font-serif text-2xl sm:text-3xl text-[#3E3335]">
@@ -793,7 +809,7 @@ export const BookingTool: React.FC = () => {
                         <span className="font-medium text-[#3E3335]">Behandlung:</span>{' '}
                         <span>
                           {treatmentType === 'zones'
-                            ? `Botox ${zoneCount} Zone(n)`
+                            ? `Botulinumtoxin ${zoneCount} Zone(n)`
                             : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name}
                         </span>
                       </div>
@@ -931,7 +947,7 @@ export const BookingTool: React.FC = () => {
                       <span className="text-[#775B5D]">Behandlung:</span>
                       <span className="font-medium text-right">
                         {treatmentType === 'zones'
-                          ? `Botox ${zoneCount} Zone(n)`
+                          ? `Botulinumtoxin ${zoneCount} Zone(n)`
                           : OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name}
                       </span>
                     </div>

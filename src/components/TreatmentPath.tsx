@@ -13,8 +13,8 @@ export const TreatmentPath: React.FC = () => {
     {
       id: 'step-2',
       marker: 'Behandlung',
-      title: 'Die Botoxbehandlung',
-      text: 'Als approbierte Ärztin mit Spezialisierung auf ästhetische Medizin führe ich deine individuelle Behandlung nach aktuellen medizinischen Maßstäben, mit hochwertigen Materialien und medizinischem Botulinumtoxin durch.',
+      title: 'Die Botulinumtoxinbehandlung',
+      text: 'Als approbierte Ärztin mit einer Fortbildung in der ästhetischen Anwendung von Botulinumtoxin führe ich deine individuelle Behandlung nach aktuellen medizinischen Maßstäben, mit hochwertigen Materialien und medizinischem Botulinumtoxin durch.',
       icon: Sparkles,
     },
     {

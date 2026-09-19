@@ -7,10 +7,10 @@ import { Pricing } from './components/Pricing';
 import { AboutMilena } from './components/AboutMilena';
 import { FaqLexicon } from './components/FaqLexicon';
 import { BookingTool } from './components/BookingTool';
-import { Newsletter } from './components/Newsletter';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { ImpressumPage } from './components/ImpressumPage';
+import { DatenschutzPage } from './components/DatenschutzPage';
 import { SectionId } from './types';
 import { NAVIGATION_ITEMS } from './config';
 
@@ -108,7 +108,22 @@ export default function App() {
 
   // Route: /impressum
   if (currentPath === '/impressum') {
-    return <ImpressumPage onNavigateHome={() => navigateTo('/')} />;
+    return (
+      <ImpressumPage
+        onNavigateHome={() => navigateTo('/')}
+        onNavigateDatenschutz={() => navigateTo('/datenschutz')}
+      />
+    );
+  }
+
+  // Route: /datenschutz
+  if (currentPath === '/datenschutz') {
+    return (
+      <DatenschutzPage
+        onNavigateHome={() => navigateTo('/')}
+        onNavigateImpressum={() => navigateTo('/impressum')}
+      />
+    );
   }
 
   return (
@@ -138,15 +153,15 @@ export default function App() {
         {/* 6. Termin finden (Demo Booking Calendar) */}
         <BookingTool />
 
-        {/* 7. Phi-News */}
-        <Newsletter />
-
-        {/* 8. Sprich mit uns */}
+        {/* 7. Sprich mit uns */}
         <ContactSection onDirectBooking={() => handleNavigate('termin-buchen')} />
       </main>
 
       {/* Footer */}
-      <Footer onNavigateImpressum={() => navigateTo('/impressum')} />
+      <Footer
+        onNavigateImpressum={() => navigateTo('/impressum')}
+        onNavigateDatenschutz={() => navigateTo('/datenschutz')}
+      />
     </div>
   );
 }
