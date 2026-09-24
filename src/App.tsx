@@ -8,6 +8,7 @@ import { AboutMilena } from './components/AboutMilena';
 import { FaqLexicon } from './components/FaqLexicon';
 import { BookingTool } from './components/BookingTool';
 import { ContactSection } from './components/ContactSection';
+import { SocialMedia } from './components/SocialMedia';
 import { Footer } from './components/Footer';
 import { ImpressumPage } from './components/ImpressumPage';
 import { DatenschutzPage } from './components/DatenschutzPage';
@@ -155,6 +156,9 @@ export default function App() {
 
         {/* 7. Sprich mit uns */}
         <ContactSection onDirectBooking={() => handleNavigate('termin-buchen')} />
+
+        {/* 8. Social Media */}
+        <SocialMedia />
       </main>
 
       {/* Footer */}

@@ -37,6 +37,8 @@ export const CONTACT_CONFIG = {
     (typeof import.meta !== 'undefined' &&
       (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_GOOGLE_MAPS_API_KEY) ||
     '',
+  instagramUrl: 'https://www.instagram.com/phi_aesthetics_koeln?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==',
+  instagramHandle: '@phi_aesthetics_koeln',
 };
 
 export const NAVIGATION_ITEMS: NavItem[] = [
@@ -47,6 +49,7 @@ export const NAVIGATION_ITEMS: NavItem[] = [
   { id: 'botulinumtoxin-verstehen', label: 'Botulinumtoxin verstehen', href: '#botulinumtoxin-verstehen' },
   { id: 'termin-buchen', label: 'Termin finden', href: '#termin-buchen' },
   { id: 'kontakt', label: 'Sprich mit uns', href: '#kontakt' },
+  { id: 'social-media', label: 'Social Media', href: '#social-media' },
 ];
 
 export const ZONE_OPTIONS: ZoneOption[] = [
@@ -56,9 +59,9 @@ export const ZONE_OPTIONS: ZoneOption[] = [
 ];
 
 export const ZONE_PRICES: Record<1 | 2 | 3, number> = {
-  1: 160,
-  2: 280,
-  3: 345,
+  1: 159,
+  2: 259,
+  3: 309,
 };
 
 export const ADDON_OPTIONS: AddonOption[] = [

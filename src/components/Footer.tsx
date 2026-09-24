@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Instagram } from 'lucide-react';
 import { PhiLogo } from './PhiLogo';
 import { CONTACT_CONFIG } from '../config';
 
@@ -61,6 +61,16 @@ export const Footer: React.FC<FooterProps> = ({
             className="hover:text-[#3E3335] underline-offset-4 hover:underline transition-colors"
           >
             {CONTACT_CONFIG.phone}
+          </a>
+          <span className="hidden sm:inline opacity-40">•</span>
+          <a
+            href={CONTACT_CONFIG.instagramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#3E3335] underline-offset-4 hover:underline transition-colors inline-flex items-center gap-1.5"
+          >
+            <Instagram className="w-3.5 h-3.5" />
+            <span>{CONTACT_CONFIG.instagramHandle}</span>
           </a>
         </div>
 

@@ -6,7 +6,8 @@ export type SectionId =
   | 'botulinumtoxin-verstehen'
   | 'botox-verstehen'
   | 'termin-buchen'
-  | 'kontakt';
+  | 'kontakt'
+  | 'social-media';
 
 export interface NavItem {
   id: SectionId;
