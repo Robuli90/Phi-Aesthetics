@@ -8,7 +8,7 @@ export const GoogleMapsEmbed: React.FC = () => {
   const isMapLoaded = preferences.googleMaps;
 
   return (
-    <div className="w-full mt-10">
+    <div className="w-full">
       <div className="relative w-full rounded-2xl border border-[#E9DDDB] bg-[#FBF8F6] overflow-hidden shadow-xs transition-all">
         {!isMapLoaded ? (
           /* Datenschutzbewusster Platzhalter (Keine Verbindung zu Google vor Einwilligung) */

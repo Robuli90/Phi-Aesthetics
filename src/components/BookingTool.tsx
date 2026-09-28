@@ -4,6 +4,8 @@ import {
   Info,
   Mail,
   MessageCircle,
+  Phone,
+  HelpCircle,
 } from 'lucide-react';
 import {
   ZONE_OPTIONS,
@@ -341,31 +343,82 @@ export const BookingTool: React.FC = () => {
 
             {/* Das datenschutzbewusste SimplyBook Widget */}
             <SimplyBookWidget />
+          </div>
 
-            {/* Zusätzliche direkte Kontaktoptionen */}
-            <div className="mt-8 pt-6 border-t border-[#E9DDDB]/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#775B5D]">
-              <div className="flex items-center gap-2">
-                <Info className="w-4 h-4 shrink-0" />
-                <span>Fragen vorab oder keinen passenden Termin gefunden? Kontaktiere uns gerne direkt:</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <a
-                  href={CONTACT_CONFIG.emailHref}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#E9DDDB] hover:border-[#775B5D] hover:text-[#3E3335] transition-colors"
-                >
-                  <Mail className="w-3.5 h-3.5" />
-                  <span>E-Mail schreiben</span>
-                </a>
-                <a
-                  href="https://wa.me/4915233979650"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-[#E9DDDB] hover:border-[#25D366] hover:text-[#1EBE5D] transition-colors"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>WhatsApp</span>
-                </a>
-              </div>
+          {/* EIGENSTÄNDIGER, GROSSER ABSCHNITT: FRAGEN VORAB ODER KEINEN PASSENDEN TERMIN GEFUNDEN */}
+          <div className="w-full bg-[#FBF8F6] rounded-3xl border border-[#E9DDDB] shadow-xs p-6 sm:p-8 lg:p-10">
+            <div className="text-center max-w-2xl mx-auto mb-8">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E9DDDB]/60 text-[#775B5D] text-xs uppercase tracking-wider font-medium mb-3">
+                <HelpCircle className="w-3.5 h-3.5" />
+                Persönliche Terminabsprache
+              </span>
+              <h3 className="font-serif text-2xl sm:text-3xl text-[#3E3335] font-normal mb-3">
+                Fragen vorab oder keinen passenden Termin gefunden?
+              </h3>
+              <p className="text-base text-[#3E3335]/80 font-light leading-relaxed">
+                Kontaktiere uns gerne direkt: Nicht alle Zeitfenster sind online im Buchungssystem sichtbar – wir finden gemeinsam einen passenden Wunschtermin oder beantworten deine Fragen vorab.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto">
+              {/* WhatsApp */}
+              <a
+                href="https://wa.me/4915233979650"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-5 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#25D366] hover:shadow-xs transition-all flex flex-col items-center text-center group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#E9DDDB]/40 border border-[#D8C4C2] flex items-center justify-center shrink-0 text-[#775B5D] group-hover:bg-[#25D366] group-hover:text-white group-hover:border-[#25D366] transition-colors mb-3">
+                  <MessageCircle className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg text-[#3E3335] group-hover:text-[#1EBE5D] transition-colors mb-1">
+                  WhatsApp
+                </h4>
+                <p className="text-xs text-[#775B5D] font-light">
+                  Schnell &amp; unkompliziert chatten
+                </p>
+                <span className="text-xs text-[#3E3335] font-medium mt-2">
+                  0152 33979650
+                </span>
+              </a>
+
+              {/* Telefon */}
+              <a
+                href={CONTACT_CONFIG.phoneHref}
+                className="p-5 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#B99A99] hover:shadow-xs transition-all flex flex-col items-center text-center group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#E9DDDB]/40 border border-[#D8C4C2] flex items-center justify-center shrink-0 text-[#775B5D] group-hover:bg-[#775B5D] group-hover:text-white transition-colors mb-3">
+                  <Phone className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg text-[#3E3335] group-hover:text-[#775B5D] transition-colors mb-1">
+                  Telefon
+                </h4>
+                <p className="text-xs text-[#775B5D] font-light">
+                  Direkt persönlich sprechen
+                </p>
+                <span className="text-xs text-[#3E3335] font-medium mt-2">
+                  0152 33979650
+                </span>
+              </a>
+
+              {/* E-Mail */}
+              <a
+                href={CONTACT_CONFIG.emailHref}
+                className="p-5 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#B99A99] hover:shadow-xs transition-all flex flex-col items-center text-center group cursor-pointer"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#E9DDDB]/40 border border-[#D8C4C2] flex items-center justify-center shrink-0 text-[#775B5D] group-hover:bg-[#775B5D] group-hover:text-white transition-colors mb-3">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <h4 className="font-serif text-lg text-[#3E3335] group-hover:text-[#775B5D] transition-colors mb-1">
+                  E-Mail
+                </h4>
+                <p className="text-xs text-[#775B5D] font-light">
+                  Anfrage schreiben
+                </p>
+                <span className="text-xs text-[#3E3335] font-medium mt-2 truncate max-w-full">
+                  info.phiaesthetics@gmail.com
+                </span>
+              </a>
             </div>
           </div>
         </div>
