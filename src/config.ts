@@ -26,17 +26,17 @@ export const ASSETS = {
 export const CONTACT_CONFIG = {
   practiceName: 'Phi Aesthetics',
   doctorName: 'Dr. med. M. Philippi',
-  street: 'Feldblumenweg 7a',
-  zipCity: '50858 Köln',
+  street: 'Hermeskeiler Str. 14',
+  zipCity: '50935 Köln',
+  country: 'Deutschland',
+  fullAddress: 'Hermeskeiler Str. 14, 50935 Köln, Deutschland',
   email: 'info.phiaesthetics@gmail.com',
   phone: '0152 33979650',
   phoneHref: 'tel:+4915233979650',
   emailHref: 'mailto:info.phiaesthetics@gmail.com?subject=Deine%20Anfrage%20an%20Phi%20Aesthetics',
-  googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Feldblumenweg+7a+50858+K%C3%B6ln',
-  googleMapsApiKey:
-    (typeof import.meta !== 'undefined' &&
-      (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_GOOGLE_MAPS_API_KEY) ||
-    '',
+  googleMapsQueryUrl: 'https://www.google.com/maps/search/?api=1&query=Hermeskeiler+Str.+14%2C+50935+K%C3%B6ln%2C+Deutschland',
+  googleMapsEmbedUrl: 'https://maps.google.com/maps?q=Hermeskeiler+Str.+14%2C+50935+K%C3%B6ln%2C+Deutschland&t=&z=15&ie=UTF8&iwloc=&output=embed',
+  googlePrivacyUrl: 'https://policies.google.com/privacy?hl=de',
   instagramUrl: 'https://www.instagram.com/phi_aesthetics_koeln?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==',
   instagramHandle: '@phi_aesthetics_koeln',
 };
