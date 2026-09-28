@@ -1,5 +1,32 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
+
+// Lokale DSGVO-konforme Schriften ohne Google CDN-Verbindung (Self-Hosted)
+import '@fontsource/cormorant/300.css';
+import '@fontsource/cormorant/400.css';
+import '@fontsource/cormorant/500.css';
+import '@fontsource/cormorant/600.css';
+import '@fontsource/cormorant/700.css';
+import '@fontsource/cormorant/400-italic.css';
+
+import '@fontsource/cormorant-garamond/300.css';
+import '@fontsource/cormorant-garamond/400.css';
+import '@fontsource/cormorant-garamond/500.css';
+import '@fontsource/cormorant-garamond/600.css';
+import '@fontsource/cormorant-garamond/700.css';
+import '@fontsource/cormorant-garamond/400-italic.css';
+
+import '@fontsource/eb-garamond/400.css';
+import '@fontsource/eb-garamond/500.css';
+import '@fontsource/eb-garamond/600.css';
+import '@fontsource/eb-garamond/700.css';
+import '@fontsource/eb-garamond/800.css';
+import '@fontsource/eb-garamond/400-italic.css';
+
+import '@fontsource/manrope/400.css';
+import '@fontsource/manrope/500.css';
+import '@fontsource/manrope/600.css';
+
 import App from './App.tsx';
 import './index.css';
 

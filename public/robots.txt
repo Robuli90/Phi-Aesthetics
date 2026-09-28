@@ -1,0 +1,6 @@
+# robots.txt for Phi Aesthetics Köln
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: /sitemap.xml

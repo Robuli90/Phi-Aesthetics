@@ -12,6 +12,7 @@ import { SocialMedia } from './components/SocialMedia';
 import { Footer } from './components/Footer';
 import { ImpressumPage } from './components/ImpressumPage';
 import { DatenschutzPage } from './components/DatenschutzPage';
+import { NotFoundPage } from './components/NotFoundPage';
 import { SectionId } from './types';
 import { NAVIGATION_ITEMS } from './config';
 
@@ -123,6 +124,17 @@ export default function App() {
       <DatenschutzPage
         onNavigateHome={() => navigateTo('/')}
         onNavigateImpressum={() => navigateTo('/impressum')}
+      />
+    );
+  }
+
+  // Route: 404 Nicht gefunden (jeder andere Pfad)
+  if (currentPath !== '/') {
+    return (
+      <NotFoundPage
+        onNavigateHome={() => navigateTo('/')}
+        onNavigateImpressum={() => navigateTo('/impressum')}
+        onNavigateDatenschutz={() => navigateTo('/datenschutz')}
       />
     );
   }
