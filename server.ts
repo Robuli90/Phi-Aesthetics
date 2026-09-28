@@ -3,9 +3,35 @@ import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 
+// Einheitliche, konsistente Content-Security-Policy (CSP) Konfiguration
+const CSP_PRODUCTION = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://widget.simplybook.it https://*.simplybook.it https://*.googleapis.com https://*.gstatic.com https://*.google.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "img-src 'self' data: blob: https:",
+  "font-src 'self' data: https://fonts.gstatic.com https://*.simplybook.it",
+  "connect-src 'self' https://*.simplybook.it https://*.simplybook.me https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:",
+  "frame-src 'self' https://*.google.com https://*.simplybook.it https://*.simplybook.me",
+  "worker-src 'self' blob:",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "frame-ancestors 'none'",
+].join('; ');
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
+
+  // Sicherheits-Header in Production
+  if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+      res.setHeader('Content-Security-Policy', CSP_PRODUCTION);
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('X-Frame-Options', 'DENY');
+      res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+      next();
+    });
+  }
 
   // Gültige Standard-Routen der Web-Applikation
   const VALID_HTML_ROUTES = new Set(['/', '/impressum', '/datenschutz']);

@@ -1,0 +1,5 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://widget.simplybook.it https://*.simplybook.it https://*.googleapis.com https://*.gstatic.com https://*.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com https://*.simplybook.it; connect-src 'self' https://*.simplybook.it https://*.simplybook.me https://*.googleapis.com https://*.google.com https://*.gstatic.com data: blob:; frame-src 'self' https://*.google.com https://*.simplybook.it https://*.simplybook.me; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; frame-ancestors 'none';
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
