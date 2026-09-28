@@ -544,6 +544,74 @@ export const DatenschutzPage: React.FC<DatenschutzPageProps> = ({
             </div>
           </section>
 
+          {/* 7. Online-Terminbuchung über SimplyBook.me */}
+          <section
+            aria-labelledby="section-7-title"
+            className="p-6 sm:p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] shadow-xs space-y-6"
+          >
+            <h2
+              id="section-7-title"
+              className="font-serif text-2xl text-[#3E3335] font-normal border-b border-[#E9DDDB]/60 pb-3"
+            >
+              7. Online-Terminbuchung über SimplyBook.me
+            </h2>
+
+            <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light">
+              Wir bieten Ihnen auf unserer Website die Möglichkeit, Termine online zu buchen. Für diese Bereitstellung und Abwicklung der Online-Terminbuchung nutzen wir das Buchungssystem von SimplyBook.me. Anbieter dieses Dienstes ist die SIMPLYBOOK.ME LTD, Nafpliou 28, Medical Court, Floor 4, Flat/Office 401, 3025, Limassol, Zypern (im Folgenden „SimplyBook.me“).
+            </p>
+
+            {/* 1. Zweck und Art der Datenverarbeitung */}
+            <div className="pt-4 border-t border-[#E9DDDB]/40 space-y-3">
+              <h3 className="font-serif text-lg text-[#3E3335] font-medium">
+                1. Zweck und Art der Datenverarbeitung
+              </h3>
+              <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light">
+                Wenn Sie die Online-Terminbuchung nutzen, werden die von Ihnen in die Buchungsmaske eingegebenen Daten (z. B. Name, E-Mail-Adresse, Telefonnummer, Datum und Uhrzeit des gewünschten Termins sowie ggf. der Grund des Termins) an die Server von SimplyBook.me übertragen. Die Datenverarbeitung dient ausschließlich dem Zweck, Ihre Terminanfrage entgegenzunehmen, zu bestätigen, zu verwalten und den Termin ordnungsgemäß durchzuführen. Die Speicherung der Buchungsdaten europäischer Kunden erfolgt in der Regel auf Servern innerhalb der Europäischen Union (Google Cloud Server in Deutschland).
+              </p>
+            </div>
+
+            {/* 2. Rechtsgrundlage */}
+            <div className="pt-4 border-t border-[#E9DDDB]/40 space-y-3">
+              <h3 className="font-serif text-lg text-[#3E3335] font-medium">
+                2. Rechtsgrundlage
+              </h3>
+              <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light">
+                Die Verarbeitung Ihrer Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern die Terminbuchung zur Erfüllung eines Vertrags oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist (z. B. Buchung einer kostenpflichtigen Dienstleistung oder eines Beratungsgesprächs). Liegt kein vertragliches Verhältnis vor, basiert die Nutzung des Systems auf unserem berechtigten Interesse an einer schnellen, unkomplizierten und nutzerfreundlichen Terminorganisation gemäß Art. 6 Abs. 1 lit. f DSGVO.
+              </p>
+            </div>
+
+            {/* 3. Auftragsverarbeitung */}
+            <div className="pt-4 border-t border-[#E9DDDB]/40 space-y-3">
+              <h3 className="font-serif text-lg text-[#3E3335] font-medium">
+                3. Auftragsverarbeitung
+              </h3>
+              <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light">
+                Wir haben mit dem Anbieter eine Vereinbarung über die Auftragsverarbeitung (Data Processing Agreement, DPA) nach Art. 28 DSGVO abgeschlossen. Dadurch wird sichergestellt, dass SimplyBook.me die Daten der Nutzer streng nach unseren Weisungen und unter Einhaltung der geltenden Datenschutzstandards verarbeitet.
+              </p>
+            </div>
+
+            {/* 4. Speicherdauer */}
+            <div className="pt-4 border-t border-[#E9DDDB]/40 space-y-3">
+              <h3 className="font-serif text-lg text-[#3E3335] font-medium">
+                4. Speicherdauer
+              </h3>
+              <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light">
+                Die von Ihnen eingegebenen Daten verbleiben bei uns, bis Sie uns zur Löschung auffordern, Ihre Einwilligung zur Speicherung widerrufen oder der Zweck für die Datenspeicherung entfällt (z. B. nach abgeschlossener Bearbeitung Ihres Termins). Zwingende gesetzliche Bestimmungen – insbesondere steuer- und handelsrechtliche Aufbewahrungsfristen – bleiben hiervon unberührt.
+              </p>
+              <p className="text-sm sm:text-base text-[#3E3335]/90 leading-relaxed font-light pt-2">
+                Weitere Informationen zum Umgang mit Nutzerdaten finden Sie in der{' '}
+                <a
+                  href="https://simplybook.me/de/policy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#775B5D] hover:underline font-medium inline-flex items-center gap-1"
+                >
+                  Datenschutzerklärung von SimplyBook.me <ExternalLink className="w-3 h-3" />
+                </a>.
+              </p>
+            </div>
+          </section>
+
           {/* Quelle */}
           <div className="p-4 rounded-xl bg-[#E9DDDB]/20 border border-[#E9DDDB] text-xs text-[#775B5D] font-light flex items-center justify-between">
             <span>Quelle: e-recht24.de</span>
