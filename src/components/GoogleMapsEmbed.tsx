@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
-import { MapPin, ExternalLink, Map as MapIcon } from 'lucide-react';
+import React from 'react';
+import { MapPin, ExternalLink, Map as MapIcon, ShieldCheck } from 'lucide-react';
 import { CONTACT_CONFIG } from '../config';
+import { useConsent } from '../context/ConsentContext';
 
 export const GoogleMapsEmbed: React.FC = () => {
-  // Rein temporärer State für diese Sitzung – keine dauerhafte Speicherung in Cookie oder Local Storage
-  const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
+  const { preferences, grantServiceConsent, openModal } = useConsent();
+  const isMapLoaded = preferences.googleMaps;
 
   return (
     <div className="w-full mt-10">
       <div className="relative w-full rounded-2xl border border-[#E9DDDB] bg-[#FBF8F6] overflow-hidden shadow-xs transition-all">
         {!isMapLoaded ? (
-          /* Datenschutzbewusster Platzhalter (Keine Verbindung zu Google vor Klick) */
+          /* Datenschutzbewusster Platzhalter (Keine Verbindung zu Google vor Einwilligung) */
           <div
             className="p-6 sm:p-10 md:p-12 flex flex-col items-center justify-center text-center min-h-[340px] sm:min-h-[380px]"
             role="region"
@@ -39,7 +40,7 @@ export const GoogleMapsEmbed: React.FC = () => {
             {/* Aktionsbutton: Google Maps laden */}
             <button
               type="button"
-              onClick={() => setIsMapLoaded(true)}
+              onClick={() => grantServiceConsent('googleMaps')}
               className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#775B5D] text-white text-sm font-medium hover:bg-[#5E4749] focus:outline-none focus:ring-2 focus:ring-[#775B5D] focus:ring-offset-2 transition-all cursor-pointer shadow-xs active:scale-[0.99]"
             >
               <MapIcon className="w-4 h-4" aria-hidden="true" />
@@ -60,7 +61,7 @@ export const GoogleMapsEmbed: React.FC = () => {
             </div>
           </div>
         ) : (
-          /* Nach Klick: Google Maps iFrame */
+          /* Nach Einwilligung: Google Maps iFrame */
           <div className="w-full flex flex-col">
             <div className="relative w-full h-[360px] sm:h-[420px] bg-[#E9DDDB]/20">
               <iframe
@@ -73,21 +74,31 @@ export const GoogleMapsEmbed: React.FC = () => {
               />
             </div>
 
-            {/* Leiste unter der geladenen Karte mit Link zu Google Maps */}
+            {/* Leiste unter der geladenen Karte mit Link zu Google Maps und Datenschutz-Option */}
             <div className="px-4 py-3 bg-[#FBF8F6] border-t border-[#E9DDDB] flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#775B5D]">
               <div className="flex items-center gap-1.5 text-center sm:text-left">
                 <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 <span>{CONTACT_CONFIG.fullAddress}</span>
               </div>
-              <a
-                href={CONTACT_CONFIG.googleMapsQueryUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 hover:text-[#3E3335] underline-offset-4 hover:underline transition-colors shrink-0"
-              >
-                <span>Standort in Google Maps öffnen</span>
-                <ExternalLink className="w-3 h-3" aria-hidden="true" />
-              </a>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={openModal}
+                  className="underline hover:text-[#3E3335] transition-colors cursor-pointer"
+                >
+                  Einwilligung anpassen
+                </button>
+                <span>•</span>
+                <a
+                  href={CONTACT_CONFIG.googleMapsQueryUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 hover:text-[#3E3335] underline-offset-4 hover:underline transition-colors shrink-0"
+                >
+                  <span>Standort in Google Maps öffnen</span>
+                  <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                </a>
+              </div>
             </div>
           </div>
         )}

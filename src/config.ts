@@ -39,6 +39,8 @@ export const CONTACT_CONFIG = {
   googlePrivacyUrl: 'https://policies.google.com/privacy?hl=de',
   instagramUrl: 'https://www.instagram.com/phi_aesthetics_koeln?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==',
   instagramHandle: '@phi_aesthetics_koeln',
+  simplyBookUrl: 'https://phiaesthetics.simplybook.it',
+  simplyBookPrivacyUrl: 'https://simplybook.me/de/privacy-policy',
 };
 
 export const NAVIGATION_ITEMS: NavItem[] = [

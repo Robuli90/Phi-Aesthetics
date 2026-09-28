@@ -15,12 +15,14 @@ import { DatenschutzPage } from './components/DatenschutzPage';
 import { NotFoundPage } from './components/NotFoundPage';
 import { SectionId } from './types';
 import { NAVIGATION_ITEMS } from './config';
+import { ConsentProvider } from './context/ConsentContext';
+import { ConsentManager } from './components/ConsentManager';
 
 const normalizePath = (path: string) => {
   return path.toLowerCase().replace(/\/+$/, '') || '/';
 };
 
-export default function App() {
+function MainApp() {
   const [currentPath, setCurrentPath] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       return normalizePath(window.location.pathname);
@@ -163,7 +165,7 @@ export default function App() {
         {/* 5. Botox verstehen */}
         <FaqLexicon initialCategory={faqCategory} />
 
-        {/* 6. Termin finden (Demo Booking Calendar) */}
+        {/* 6. Termin finden (Preisrechner & SimplyBook Online-Terminbuchung) */}
         <BookingTool />
 
         {/* 7. Sprich mit uns */}
@@ -179,5 +181,14 @@ export default function App() {
         onNavigateDatenschutz={() => navigateTo('/datenschutz')}
       />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ConsentProvider>
+      <MainApp />
+      <ConsentManager />
+    </ConsentProvider>
   );
 }

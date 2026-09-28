@@ -2,6 +2,7 @@ import React from 'react';
 import { ArrowUp, Instagram } from 'lucide-react';
 import { PhiLogo } from './PhiLogo';
 import { CONTACT_CONFIG } from '../config';
+import { useConsent } from '../context/ConsentContext';
 
 interface FooterProps {
   onNavigateImpressum?: () => void;
@@ -12,6 +13,8 @@ export const Footer: React.FC<FooterProps> = ({
   onNavigateImpressum,
   onNavigateDatenschutz,
 }) => {
+  const { openModal } = useConsent();
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -74,8 +77,15 @@ export const Footer: React.FC<FooterProps> = ({
           </a>
         </div>
 
-        {/* Rechtliches & Scroll to top */}
-        <div className="flex items-center gap-6 text-xs text-[#775B5D]">
+        {/* Rechtliches, Consent & Scroll to top */}
+        <div className="flex flex-wrap items-center justify-center md:justify-end gap-5 sm:gap-6 text-xs text-[#775B5D]">
+          <button
+            type="button"
+            onClick={openModal}
+            className="hover:text-[#3E3335] transition-colors underline-offset-4 hover:underline cursor-pointer"
+          >
+            Cookie-Einstellungen
+          </button>
           <a
             href="/datenschutz"
             onClick={handleDatenschutzClick}
