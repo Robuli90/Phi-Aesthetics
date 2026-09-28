@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Calendar, ExternalLink, ShieldCheck, RefreshCw } from 'lucide-react';
 import { useConsent } from '../context/ConsentContext';
-import { CONTACT_CONFIG } from '../config';
 
 const SCRIPT_URL = 'https://widget.simplybook.it/v2/widget/widget.js';
 const SCRIPT_ID = 'simplybook-widget-script';
 const CONTAINER_ID = 'simplybook-widget-container';
 
 const SIMPLYBOOK_URL = 'https://phiaesthetics.simplybook.it';
+const SIMPLYBOOK_IFRAME_URL =
+  'https://phiaesthetics.simplybook.it/v2/?widget-type=iframe&theme=minimal&timeline=modern&datepicker=top_calendar';
 const SIMPLYBOOK_PRIVACY_URL = 'https://simplybook.me/de/privacy-policy';
 
 // Vorgegebene SimplyBook-Widget-Konfiguration
@@ -49,7 +50,7 @@ export const SimplyBookWidget: React.FC = () => {
   const isConsentGiven = preferences.simplyBook;
 
   const [isLoadingScript, setIsLoadingScript] = useState<boolean>(false);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [useIframeFallback, setUseIframeFallback] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const initializedRef = useRef<boolean>(false);
@@ -66,23 +67,26 @@ export const SimplyBookWidget: React.FC = () => {
     }
 
     let isMounted = true;
+    let fallbackTimeout: NodeJS.Timeout | null = null;
 
     const initWidget = () => {
       if (!isMounted) return;
       if (initializedRef.current) return;
 
+      // Sicherstellen, dass das DOM-Element fertig gemountet ist (verhindert document.body-Fallback)
+      const containerElem = containerRef.current || document.getElementById(CONTAINER_ID);
+      if (!containerElem) {
+        // Noch nicht im DOM: kurzen Retry ansetzen
+        setTimeout(initWidget, 50);
+        return;
+      }
+
       const SimplybookWidgetClass = (window as unknown as { SimplybookWidget?: any }).SimplybookWidget;
       if (typeof SimplybookWidgetClass === 'function') {
         try {
           // React Strict Mode & Mehrfach-Instanz-Schutz:
-          // SimplyBook speichert ein internes Flag SimplybookWidget._instanceCreated
           SimplybookWidgetClass._instanceCreated = false;
-
-          // Sicherstellen, dass der Container existiert und leer ist
-          const containerElem = containerRef.current || document.getElementById(CONTAINER_ID);
-          if (containerElem) {
-            containerElem.innerHTML = '';
-          }
+          containerElem.innerHTML = '';
 
           // Initialisiere das Widget mit der vorgegebenen Konfiguration und container_id
           const widget = new SimplybookWidgetClass({
@@ -93,36 +97,47 @@ export const SimplyBookWidget: React.FC = () => {
           widgetInstanceRef.current = widget;
           initializedRef.current = true;
           setIsLoadingScript(false);
+          if (fallbackTimeout) clearTimeout(fallbackTimeout);
         } catch (err) {
-          console.error('Fehler bei SimplyBook Widget Initialisierung:', err);
+          console.warn('SimplyBook Widget API Initialisierung fehlgeschlagen, nutze iFrame-Fallback:', err);
           if (isMounted) {
-            setLoadError('Das Buchungs-Widget konnte nicht initialisiert werden.');
+            setUseIframeFallback(true);
             setIsLoadingScript(false);
           }
         }
       } else {
         if (isMounted) {
-          setLoadError('SimplybookWidget Skript nicht verfügbar.');
+          setUseIframeFallback(true);
           setIsLoadingScript(false);
         }
       }
     };
 
+    // Timeout falls externes Skript durch AdBlocker / CSP blockiert wird: nach 3.5s direkten iFrame laden
+    fallbackTimeout = setTimeout(() => {
+      if (isMounted && !initializedRef.current) {
+        console.info('SimplyBook Script Ladezeit überschritten (ggf. AdBlocker/CSP), aktiviere direkten iFrame.');
+        setUseIframeFallback(true);
+        setIsLoadingScript(false);
+      }
+    }, 3500);
+
     // Prüfen, ob das Skript bereits im Dokument vorhanden ist
     let scriptElement = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
 
     if ((window as unknown as { SimplybookWidget?: unknown }).SimplybookWidget) {
-      // Skript ist bereits geladen
-      initWidget();
+      // Skript ist bereits geladen, verzögert ausführen bis Container da ist
+      setTimeout(initWidget, 30);
     } else if (scriptElement) {
       // Skript lädt bereits
       setIsLoadingScript(true);
       const onExistingScriptLoad = () => {
-        initWidget();
+        setTimeout(initWidget, 30);
       };
       scriptElement.addEventListener('load', onExistingScriptLoad, { once: true });
       return () => {
         scriptElement?.removeEventListener('load', onExistingScriptLoad);
+        if (fallbackTimeout) clearTimeout(fallbackTimeout);
       };
     } else {
       // Skript kontrolliert und erstmalig nach Freigabe dynamisch nachladen
@@ -135,13 +150,13 @@ export const SimplyBookWidget: React.FC = () => {
 
       scriptElement.onload = () => {
         if (isMounted) {
-          initWidget();
+          setTimeout(initWidget, 30);
         }
       };
 
       scriptElement.onerror = () => {
         if (isMounted) {
-          setLoadError('Das SimplyBook-Skript konnte nicht geladen werden.');
+          setUseIframeFallback(true);
           setIsLoadingScript(false);
         }
       };
@@ -151,7 +166,7 @@ export const SimplyBookWidget: React.FC = () => {
 
     return () => {
       isMounted = false;
-      // Bereinigung bei Unmount
+      if (fallbackTimeout) clearTimeout(fallbackTimeout);
       initializedRef.current = false;
       const SimplybookWidgetClass = (window as unknown as { SimplybookWidget?: any })?.SimplybookWidget;
       if (SimplybookWidgetClass) {
@@ -225,35 +240,32 @@ export const SimplyBookWidget: React.FC = () => {
         /* AKTIVER BEREICH (Nach Einwilligung) */
         <div className="w-full flex flex-col">
           {/* Ladezustand / Feedback */}
-          {isLoadingScript && (
+          {isLoadingScript && !useIframeFallback && (
             <div className="w-full py-16 flex flex-col items-center justify-center text-center">
               <RefreshCw className="w-6 h-6 text-[#775B5D] animate-spin mb-3" />
-              <p className="text-sm text-[#775B5D]">Terminbuchung wird geladen...</p>
+              <p className="text-sm text-[#775B5D]">Terminkalender wird vorbereitet...</p>
             </div>
           )}
 
-          {/* Fehleranzeige mit direktem Fallback-Link */}
-          {loadError && (
-            <div className="p-6 rounded-2xl bg-amber-50/80 border border-amber-200 text-center mb-6">
-              <p className="text-sm text-amber-900 mb-3">{loadError}</p>
-              <a
-                href={SIMPLYBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[#775B5D] text-white text-xs font-medium hover:bg-[#5E4749] transition-colors"
-              >
-                <span>Direkt auf SimplyBook buchen</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
+          {/* Wenn das externe Skript blockiert wird: nahtloser iFrame-Fallback */}
+          {useIframeFallback ? (
+            <div className="w-full min-h-[650px] sm:min-h-[750px] rounded-2xl overflow-hidden bg-white border border-[#E9DDDB] shadow-xs">
+              <iframe
+                title="SimplyBook Online-Terminbuchung"
+                src={SIMPLYBOOK_IFRAME_URL}
+                className="w-full min-h-[650px] sm:min-h-[750px] border-0"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
+          ) : (
+            /* SimplyBook Container für das offizielle JS-Widget */
+            <div
+              id={CONTAINER_ID}
+              ref={containerRef}
+              className="w-full min-h-[650px] sm:min-h-[750px] rounded-2xl overflow-hidden bg-white border border-[#E9DDDB] shadow-xs"
+            />
           )}
-
-          {/* SimplyBook Container für das iFrame Widget */}
-          <div
-            id={CONTAINER_ID}
-            ref={containerRef}
-            className="w-full min-h-[550px] sm:min-h-[650px] rounded-2xl overflow-hidden bg-white border border-[#E9DDDB] shadow-xs"
-          />
 
           {/* Fußzeile unter dem Widget */}
           <div className="mt-3 px-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-[#775B5D]">

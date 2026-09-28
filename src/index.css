@@ -74,3 +74,12 @@ h1 *, h2 *, h3 *, h4 *, h5 *, h6 *,
     scroll-behavior: auto !important;
   }
 }
+
+/* SimplyBook iFrame Responsive Styling */
+.sb-widget-iframe {
+  width: 100% !important;
+  min-height: 650px !important;
+  border: 0 !important;
+  display: block !important;
+  background-color: #ffffff;
+}
