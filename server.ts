@@ -43,40 +43,35 @@ async function startServer() {
 
   // Dynamische robots.txt mit passender Sitemap-URL
   app.get('/robots.txt', (req, res) => {
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.get('host') || 'phiaesthetics.de';
-    const robotsContent = `# robots.txt for Phi Aesthetics Köln
-User-agent: *
+    const robotsContent = `User-agent: *
 Allow: /
 
-Sitemap: ${protocol}://${host}/sitemap.xml
+Sitemap: https://phi-aesthetics.de/sitemap.xml
+Sitemap: https://www.phi-aesthetics.de/sitemap.xml
 `;
     res.type('text/plain').send(robotsContent);
   });
 
   // Dynamische sitemap.xml für Suchmaschinen
   app.get('/sitemap.xml', (req, res) => {
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.get('host') || 'phiaesthetics.de';
-    const baseUrl = `${protocol}://${host}`;
     const today = new Date().toISOString().split('T')[0];
 
     const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>${baseUrl}/</loc>
+    <loc>https://phi-aesthetics.de/</loc>
     <lastmod>${today}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>${baseUrl}/impressum</loc>
+    <loc>https://phi-aesthetics.de/impressum</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
   <url>
-    <loc>${baseUrl}/datenschutz</loc>
+    <loc>https://phi-aesthetics.de/datenschutz</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
