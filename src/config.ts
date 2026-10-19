@@ -63,16 +63,16 @@ export const ZONE_OPTIONS: ZoneOption[] = [
 export const ZONE_PRICES: Record<1 | 2 | 3, number> = {
   1: 159,
   2: 259,
-  3: 309,
+  3: 299,
 };
 
 export const ADDON_OPTIONS: AddonOption[] = [
-  { id: 'bunny-lines', name: 'Bunny Lines', price: 70, formattedPrice: 'ab 70 €', description: 'Feine Fältchen am oberen Nasenbereich' },
-  { id: 'lip-flip', name: 'Lip Flip', price: 70, formattedPrice: 'ab 70 €', description: 'Dezente Entspannung der Oberlippenmuskulatur' },
-  { id: 'dao', name: 'DAO', price: 70, formattedPrice: 'ab 70 €', description: 'Musculus depressor anguli oris (Mundwinkelsenker)' },
-  { id: 'brow-lift', name: 'Brow Lift', price: 70, formattedPrice: 'ab 70 €', description: 'Sanftes, dezentes Anheben der Augenbrauenlinie' },
-  { id: 'gummy-smile', name: 'Gummy Smile', price: 70, formattedPrice: 'ab 70 €', description: 'Dezente Harmonisierung bei sichtbarem Zahnfleischlächeln' },
-  { id: 'kinn', name: 'Kinn', price: 70, formattedPrice: 'ab 70 €', description: 'Entspannung des Kinnmuskels (Pflastersteinkinn)' },
+  { id: 'bunny-lines', name: 'Bunny Lines', price: 60, formattedPrice: 'ab 60 €', description: 'Feine Fältchen am oberen Nasenbereich' },
+  { id: 'lip-flip', name: 'Lip Flip', price: 60, formattedPrice: 'ab 60 €', description: 'Dezente Entspannung der Oberlippenmuskulatur' },
+  { id: 'dao', name: 'DAO', price: 60, formattedPrice: 'ab 60 €', description: 'Musculus depressor anguli oris (Mundwinkelsenker)' },
+  { id: 'brow-lift', name: 'Brow Lift', price: 60, formattedPrice: 'ab 60 €', description: 'Sanftes, dezentes Anheben der Augenbrauenlinie' },
+  { id: 'gummy-smile', name: 'Gummy Smile', price: 60, formattedPrice: 'ab 60 €', description: 'Dezente Harmonisierung bei sichtbarem Zahnfleischlächeln' },
+  { id: 'kinn', name: 'Kinn', price: 60, formattedPrice: 'ab 60 €', description: 'Entspannung des Kinnmuskels (Pflastersteinkinn)' },
 ];
 
 export const OTHER_TREATMENTS: OtherTreatmentOption[] = [

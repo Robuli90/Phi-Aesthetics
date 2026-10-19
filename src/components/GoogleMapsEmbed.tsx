@@ -13,7 +13,7 @@ export const GoogleMapsEmbed: React.FC = () => {
         {!isMapLoaded ? (
           /* Datenschutzbewusster Platzhalter (Keine Verbindung zu Google vor Einwilligung) */
           <div
-            className="p-6 sm:p-10 md:p-12 flex flex-col items-center justify-center text-center min-h-[340px] sm:min-h-[380px]"
+            className="p-6 sm:p-8 flex flex-col items-center justify-center text-center min-h-[320px] sm:min-h-[360px]"
             role="region"
             aria-label="Google Maps Kartenbereich"
           >
@@ -63,7 +63,7 @@ export const GoogleMapsEmbed: React.FC = () => {
         ) : (
           /* Nach Einwilligung: Google Maps iFrame */
           <div className="w-full flex flex-col">
-            <div className="relative w-full h-[360px] sm:h-[420px] bg-[#E9DDDB]/20">
+            <div className="relative w-full h-[320px] sm:h-[380px] bg-[#E9DDDB]/20">
               <iframe
                 title="Google Maps Standort: Hermeskeiler Str. 14, 50935 Köln"
                 src={CONTACT_CONFIG.googleMapsEmbedUrl}

@@ -18,6 +18,7 @@ import { SimplyBookWidget } from './SimplyBookWidget';
 
 export const BookingTool: React.FC = () => {
   // Treatment selection state (Defaults to "Botoxbehandlung nach Zonen")
+  const [bookingImgSrc, setBookingImgSrc] = useState('/assets/Praxis-für-Botox-in-Köln_Lindenthal.jpeg');
   const [treatmentType, setTreatmentType] = useState<'zones' | 'other'>('zones');
   const [zoneCount, setZoneCount] = useState<1 | 2 | 3>(2);
   const [selectedZones, setSelectedZones] = useState<string[]>(['glabella', 'stirn']);
@@ -75,20 +76,42 @@ export const BookingTool: React.FC = () => {
       aria-labelledby="booking-title"
     >
       <div className="max-w-6xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
-            Interaktive Terminauswahl
-          </span>
-          <h2
-            id="booking-title"
-            className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#3E3335] font-normal mb-4"
-          >
-            Termin finden
-          </h2>
-          <p className="text-base text-[#3E3335]/80 font-light">
-            Plane deine individuelle Behandlung in Ruhe: Berechne deine gewünschten Behandlungszonen und buche deinen Wunschtermin direkt online.
-          </p>
+        {/* Section Header: Bild links, Überschrift & Text rechts */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 md:gap-10 max-w-4xl mx-auto mb-14">
+          {/* Bild links: Praxis-für-Botox-in-Köln_Lindenthal.jpeg */}
+          <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-3xl overflow-hidden border border-[#E9DDDB] shadow-xs shrink-0 bg-[#F5ECE8]/30">
+            <img
+              src={bookingImgSrc}
+              alt="Praxis für Botox in Köln Lindenthal – Interaktive Terminauswahl"
+              title="Praxis für Botox in Köln Lindenthal"
+              className="w-full h-full object-cover object-center"
+              referrerPolicy="no-referrer"
+              loading="lazy"
+              onError={() => {
+                if (bookingImgSrc.includes('für') || bookingImgSrc.includes('Köln')) {
+                  setBookingImgSrc('/assets/Praxis-für-Botox-in-Köln_Lindenthal.jpeg');
+                } else if (bookingImgSrc.startsWith('/assets/')) {
+                  setBookingImgSrc(bookingImgSrc.replace('/assets/', '/'));
+                }
+              }}
+            />
+          </div>
+
+          {/* Überschrift & Text rechts */}
+          <div className="flex-1 flex flex-col justify-center self-center sm:self-start">
+            <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
+              Interaktive Terminauswahl
+            </span>
+            <h2
+              id="booking-title"
+              className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#3E3335] font-normal mb-4"
+            >
+              Termin finden
+            </h2>
+            <p className="text-base text-[#3E3335]/80 font-light leading-relaxed">
+              Plane deine individuelle Behandlung in Ruhe: Berechne deine gewünschten Behandlungszonen und buche deinen Wunschtermin direkt online.
+            </p>
+          </div>
         </div>
 
         {/* 2-STEP LAYOUT: UNTEREINANDER (STACKED) FÜR MAXIMALE BREITE */}

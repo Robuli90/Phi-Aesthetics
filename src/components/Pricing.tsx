@@ -59,7 +59,7 @@ export const Pricing: React.FC<PricingProps> = ({ onBookTreatment }) => {
                 </div>
                 <div className="flex items-center justify-between py-2 border-b border-[#E9DDDB]">
                   <span className="text-sm font-medium text-[#3E3335]">3 Zonen</span>
-                  <span className="font-serif text-xl text-[#775B5D]">ab 309 €</span>
+                  <span className="font-serif text-xl text-[#775B5D]">ab 299 €</span>
                 </div>
               </div>
             </div>

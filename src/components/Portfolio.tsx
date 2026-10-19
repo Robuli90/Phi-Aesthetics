@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { PhiLine } from './PhiLine';
 
@@ -7,6 +7,8 @@ interface PortfolioProps {
 }
 
 export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
+  const [imgSrc, setImgSrc] = useState('/assets/Botox-in-Köln-am-Hermeskeiler_Platz.jpeg');
+
   return (
     <section
       id="angebote"
@@ -14,20 +16,42 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
       aria-labelledby="portfolio-title"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
-            Leistungsportfolio
-          </span>
-          <h2
-            id="portfolio-title"
-            className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
-          >
-            Was wir anbieten
-          </h2>
-          <p className="text-base text-[#3E3335]/80 font-light">
-            Ein fokussiertes Spektrum ärztlicher Botulinumtoxin-Behandlungen – präzise abgestimmt auf deine natürliche Mimik.
-          </p>
+        {/* Section Header: Überschrift & Text links, Bild rechts */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 md:gap-10 max-w-4xl mx-auto mb-16">
+          {/* Überschrift & Text links */}
+          <div className="flex-1 flex flex-col justify-center self-center sm:self-start">
+            <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
+              Leistungsportfolio
+            </span>
+            <h2
+              id="portfolio-title"
+              className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
+            >
+              Was wir anbieten
+            </h2>
+            <p className="text-base text-[#3E3335]/80 font-light leading-relaxed">
+              Ein fokussiertes Spektrum ärztlicher Botulinumtoxin-Behandlungen – präzise abgestimmt auf deine natürliche Mimik.
+            </p>
+          </div>
+
+          {/* Bild rechts: Botox-in-Köln-am-Hermeskeiler_Platz.jpeg */}
+          <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-3xl overflow-hidden border border-[#E9DDDB] shadow-xs shrink-0 bg-[#F5ECE8]/30">
+            <img
+              src={imgSrc}
+              alt="Praxis am Hermeskeiler Platz in Köln – Leistungsportfolio"
+              title="Botox in Köln am Hermeskeiler Platz"
+              className="w-full h-full object-cover object-center"
+              referrerPolicy="no-referrer"
+              loading="lazy"
+              onError={() => {
+                if (imgSrc.includes('Köln')) {
+                  setImgSrc('/assets/Botox-in-Köln-am-Hermeskeiler_Platz.jpeg');
+                } else if (imgSrc.startsWith('/assets/')) {
+                  setImgSrc(imgSrc.replace('/assets/', '/'));
+                }
+              }}
+            />
+          </div>
         </div>
 
         {/* 4 Connected Blocks in Responsive Grid */}

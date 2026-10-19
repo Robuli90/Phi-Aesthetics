@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MessageSquareText, Sparkles, HeartHandshake } from 'lucide-react';
 
 export const TreatmentPath: React.FC = () => {
+  const [imgSrc, setImgSrc] = useState('/assets/Botox_in_Köln_von_Dr_Milena_Philippi.jpeg');
+
   const steps = [
     {
       id: 'step-1',
@@ -33,20 +35,42 @@ export const TreatmentPath: React.FC = () => {
       aria-labelledby="treatment-path-title"
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section Heading */}
-        <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
-          <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
-            Behandlungsablauf
-          </span>
-          <h2
-            id="treatment-path-title"
-            className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
-          >
-            Dein Weg
-          </h2>
-          <p className="text-base text-[#3E3335]/80 font-light">
-            Vom ersten persönlichen Gespräch bis zur vertrauensvollen Nachsorge: Drei ruhige Schritte zu deinem Wohlbefinden.
-          </p>
+        {/* Section Heading: Bild links, Überschrift & Text rechts */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 md:gap-10 max-w-4xl mx-auto mb-16 md:mb-20">
+          {/* Bild links: Botox_in_Köln_von_Dr_Milena_Philippi.jpeg */}
+          <div className="w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52 rounded-3xl overflow-hidden border border-[#E9DDDB] shadow-xs shrink-0 bg-[#F5ECE8]/30">
+            <img
+              src={imgSrc}
+              alt="Dr. med. Milena Philippi – Behandlungsablauf bei Phi Aesthetics in Köln"
+              title="Dr. med. Milena Philippi"
+              className="w-full h-full object-cover object-top"
+              referrerPolicy="no-referrer"
+              loading="lazy"
+              onError={() => {
+                if (imgSrc.includes('Köln')) {
+                  setImgSrc('/assets/Botox_in_Köln_von_Dr_Milena_Philippi.jpeg');
+                } else if (imgSrc.startsWith('/assets/')) {
+                  setImgSrc(imgSrc.replace('/assets/', '/'));
+                }
+              }}
+            />
+          </div>
+
+          {/* Überschrift & Text rechts */}
+          <div className="flex-1 flex flex-col justify-center self-center sm:self-start">
+            <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
+              Behandlungsablauf
+            </span>
+            <h2
+              id="treatment-path-title"
+              className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
+            >
+              Dein Weg
+            </h2>
+            <p className="text-base text-[#3E3335]/80 font-light leading-relaxed">
+              Vom ersten persönlichen Gespräch bis zur vertrauensvollen Nachsorge: Drei ruhige Schritte zu deinem Wohlbefinden.
+            </p>
+          </div>
         </div>
 
         {/* Process Flowchart with Real Process Line */}
