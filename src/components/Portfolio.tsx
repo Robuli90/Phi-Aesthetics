@@ -183,7 +183,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
                 {[
                   'Masseter',
                   'Nefertiti',
-                  'Hyperhidrose im Bereich Achseln/Arme',
+                  'Hyperhidrose im Bereich Achseln / Arme',
                   'Hände',
                 ].map((item) => (
                   <span

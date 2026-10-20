@@ -79,29 +79,29 @@ export const OTHER_TREATMENTS: OtherTreatmentOption[] = [
   {
     id: 'masseter',
     name: 'Masseter',
-    priceLabel: 'ab 350 €',
-    basePrice: 350,
+    priceLabel: 'ab 300 €',
+    basePrice: 300,
     description: 'Gezielte Behandlung des Kaumuskels bei Bruxismus (Zähneknirschen) oder zur optischen Konturierung.',
   },
   {
     id: 'nefertiti',
     name: 'Nefertiti',
-    priceLabel: 'ab 399 €',
-    basePrice: 399,
+    priceLabel: 'ab 350 €',
+    basePrice: 350,
     description: 'Harmonische Definition der Kieferlinie und Entlastung des Platysmas am Hals.',
   },
   {
     id: 'hyperhidrose',
-    name: 'Hyperhidrose im Bereich Achseln/Arme',
-    priceLabel: 'ab 500 €',
-    basePrice: 500,
+    name: 'Hyperhidrose im Bereich Achseln / Arme',
+    priceLabel: 'ab 430 €',
+    basePrice: 430,
     description: 'Effektive, zeitweise Hemmung übermäßiger Schweißdrüsenaktivität im Achselbereich.',
   },
   {
     id: 'haende',
     name: 'Hände',
-    priceLabel: 'ab 550 €',
-    basePrice: 550,
+    priceLabel: 'ab 450 €',
+    basePrice: 450,
     description: 'Ärztliche Behandlung bei übermäßigem Schwitzen an den Handflächen.',
   },
 ];
@@ -202,7 +202,7 @@ export const FAQ_DATA: FaqItem[] = [
   },
   {
     category: 'behandlungen',
-    term: 'Hyperhidrose im Bereich Achseln/Arme',
+    term: 'Hyperhidrose im Bereich Achseln / Arme',
     explanation: 'Hyperhidrose bezeichnet übermäßiges Schwitzen. Bei einer Behandlung im Bereich Achseln/Arme wird zunächst individuell geklärt, ob diese Methode passend ist, um die Schweißdrüsenaktivität schonend zu reduzieren.',
   },
   {
