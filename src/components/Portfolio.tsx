@@ -1,27 +1,100 @@
-import React, { useState } from 'react';
-import { ArrowUpRight } from 'lucide-react';
-import { PhiLine } from './PhiLine';
+import React, { useState, useMemo } from 'react';
+import { CheckCircle2, Calendar, Info } from 'lucide-react';
+import {
+  ZONE_OPTIONS,
+  ZONE_PRICES,
+  ADDON_OPTIONS,
+  OTHER_TREATMENTS,
+} from '../config';
 
 interface PortfolioProps {
-  onLearnMore: (faqCategory?: 'grundlagen' | 'behandlungen' | 'ablauf' | 'sicherheit') => void;
+  onBookTreatment?: () => void;
+  onLearnMore?: (faqCategory?: 'grundlagen' | 'behandlungen' | 'ablauf' | 'sicherheit') => void;
 }
 
-export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
+export const Portfolio: React.FC<PortfolioProps> = ({ onBookTreatment }) => {
   const [imgSrc, setImgSrc] = useState('/assets/Botox-in-Köln-am-Hermeskeiler_Platz.jpeg');
+
+  // Treatment selection state
+  const [treatmentType, setTreatmentType] = useState<'zones' | 'other'>('zones');
+  const [zoneCount, setZoneCount] = useState<1 | 2 | 3>(2);
+  const [selectedZones, setSelectedZones] = useState<string[]>(['glabella', 'stirn']);
+  const [selectedAddons, setSelectedAddons] = useState<string[]>([]);
+  const [selectedOther, setSelectedOther] = useState<string>('masseter');
+
+  // Dynamic price calculation
+  const calculatedPrice = useMemo(() => {
+    if (treatmentType === 'other') {
+      const item = OTHER_TREATMENTS.find((t) => t.id === selectedOther);
+      return item ? item.basePrice || 0 : 0;
+    }
+    const base = ZONE_PRICES[zoneCount] || 0;
+    const addonsTotal = selectedAddons.reduce((sum, id) => {
+      const addon = ADDON_OPTIONS.find((a) => a.id === id);
+      return sum + (addon ? addon.price : 0);
+    }, 0);
+    return base + addonsTotal;
+  }, [treatmentType, zoneCount, selectedAddons, selectedOther]);
+
+  const handleZoneCountChange = (count: 1 | 2 | 3) => {
+    setTreatmentType('zones');
+    setZoneCount(count);
+    const defaultZonePool = ['glabella', 'stirn', 'augenwinkel'];
+    setSelectedZones(defaultZonePool.slice(0, count));
+  };
+
+  const handleToggleZone = (zoneId: string) => {
+    setTreatmentType('zones');
+    if (selectedZones.includes(zoneId)) {
+      if (selectedZones.length > 1) {
+        setSelectedZones((prev) => prev.filter((id) => id !== zoneId));
+      }
+    } else {
+      if (selectedZones.length < zoneCount) {
+        setSelectedZones((prev) => [...prev, zoneId]);
+      } else {
+        setSelectedZones((prev) => [...prev.slice(1), zoneId]);
+      }
+    }
+  };
+
+  const handleToggleAddon = (addonId: string) => {
+    setTreatmentType('zones');
+    setSelectedAddons((prev) =>
+      prev.includes(addonId) ? prev.filter((id) => id !== addonId) : [...prev, addonId]
+    );
+  };
+
+  const handleSelectOther = (otherId: string) => {
+    setTreatmentType('other');
+    setSelectedOther(otherId);
+  };
+
+  const handleBook = () => {
+    if (onBookTreatment) {
+      onBookTreatment();
+    } else {
+      const el = document.getElementById('termin-buchen');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <section
       id="angebote"
-      className="relative py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
+      className="relative py-12 md:py-18 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
       aria-labelledby="portfolio-title"
     >
+      {/* Anchor for preise so existing links or bookmarks continue to work */}
+      <div id="preise" className="sr-only" aria-hidden="true" />
+
       <div className="max-w-7xl mx-auto">
         {/* Section Header: Überschrift & Text links, Bild rechts */}
         <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 md:gap-10 max-w-4xl mx-auto mb-16">
           {/* Überschrift & Text links */}
           <div className="flex-1 flex flex-col justify-center self-center sm:self-start">
             <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
-              Leistungsportfolio
+              Leistungsportfolio und Preise
             </span>
             <h2
               id="portfolio-title"
@@ -30,7 +103,7 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
               Was wir anbieten
             </h2>
             <p className="text-base text-[#3E3335]/80 font-light leading-relaxed">
-              Ein fokussiertes Spektrum ärztlicher Botulinumtoxin-Behandlungen – präzise abgestimmt auf deine natürliche Mimik.
+              Ein fokussiertes Spektrum ärztlicher Botulinumtoxin-Behandlungen (Botox®) – präzise abgestimmt auf deine natürliche Mimik.
             </p>
           </div>
 
@@ -54,161 +127,325 @@ export const Portfolio: React.FC<PortfolioProps> = ({ onLearnMore }) => {
           </div>
         </div>
 
-        {/* 4 Connected Blocks in Responsive Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {/* Block 1: Klassische obere Gesichtszonen */}
+        {/* 3 Interaktive Boxen: GRUNDBEHANDLUNG, ERGÄNZUNGEN, SPEZIFISCHE BEREICHE */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-8 items-stretch">
+          {/* Box 1: GRUNDBEHANDLUNG (Zonenpreise) */}
           <div
-            id="portfolio-block-1"
-            className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
+            id="portfolio-card-zones"
+            className={`p-6 sm:p-8 rounded-2xl bg-[#FBF8F6] border transition-all flex flex-col justify-between ${
+              treatmentType === 'zones'
+                ? 'border-[#B99A99] shadow-sm'
+                : 'border-[#E9DDDB] hover:border-[#D8C4C2]'
+            }`}
           >
             <div>
-              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 01</div>
-              <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
-                Die drei oberen Gesichtszonen
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs uppercase tracking-wider text-[#B99A99] font-medium">
+                  Grundbehandlung
+                </span>
+                {treatmentType === 'zones' && (
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#775B5D] text-white">
+                    Aktiv
+                  </span>
+                )}
+              </div>
+              <h3 className="font-serif text-2xl text-[#3E3335] mb-2">
+                Zonenpreise
               </h3>
-              <p className="text-sm text-[#3E3335]/80 font-light leading-relaxed mb-6">
-                Drei häufig behandelte Bereiche im oberen Gesicht. Welche Zone oder Kombination zu dir passt, wird individuell im ärztlichen Gespräch besprochen.
+              <p className="text-xs text-[#3E3335]/70 font-light mb-6">
+                Für die oberen Gesichtszonen (Glabella, Stirn, Laterale Augenwinkel). Wähle deine Zonenanzahl:
               </p>
 
-              {/* Leistungen */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['Glabella', 'Stirn', 'Laterale Augenwinkel'].map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]"
-                  >
-                    {item}
-                  </span>
-                ))}
+              {/* Zonenanzahl-Schalter (1, 2 oder 3 Zonen) */}
+              <div className="grid grid-cols-3 gap-2 mb-6">
+                {([1, 2, 3] as const).map((count) => {
+                  const isSelected = treatmentType === 'zones' && zoneCount === count;
+                  return (
+                    <button
+                      key={count}
+                      type="button"
+                      onClick={() => handleZoneCountChange(count)}
+                      className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#775B5D] text-white border-[#775B5D] shadow-xs'
+                          : 'bg-white border-[#E9DDDB] text-[#3E3335] hover:border-[#D8C4C2]'
+                      }`}
+                    >
+                      <span className="block font-serif text-base font-normal">
+                        {count} {count === 1 ? 'Zone' : 'Zonen'}
+                      </span>
+                      <span
+                        className={`text-[11px] block ${
+                          isSelected ? 'text-white/85' : 'text-[#775B5D]'
+                        }`}
+                      >
+                        ab {ZONE_PRICES[count]} €
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Zonen-Auswahl (Glabella, Stirn, Augenwinkel) */}
+              <div className="space-y-2">
+                <span className="text-[11px] uppercase tracking-wider text-[#775B5D] font-medium block mb-1">
+                  Bereiche auswählen ({treatmentType === 'zones' ? selectedZones.length : 0}/{zoneCount}):
+                </span>
+                {ZONE_OPTIONS.map((zone) => {
+                  const isSelected = treatmentType === 'zones' && selectedZones.includes(zone.id);
+                  return (
+                    <button
+                      key={zone.id}
+                      type="button"
+                      onClick={() => handleToggleZone(zone.id)}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#D8C4C2]/20 border-[#B99A99] text-[#3E3335]'
+                          : 'bg-white border-[#E9DDDB] text-[#3E3335]/80 hover:border-[#D8C4C2]'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-xs sm:text-sm font-medium text-[#3E3335]">
+                          {zone.name}
+                        </div>
+                        <div className="text-[11px] text-[#3E3335]/65 font-light">
+                          {zone.description}
+                        </div>
+                      </div>
+                      <div
+                        className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ml-2 transition-colors ${
+                          isSelected
+                            ? 'bg-[#775B5D] border-[#775B5D] text-white'
+                            : 'border-[#D8C4C2]'
+                        }`}
+                      >
+                        {isSelected && <CheckCircle2 className="w-3 h-3" />}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <button
-              onClick={() => onLearnMore('behandlungen')}
-              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[#775B5D] hover:text-[#3E3335] group focus:outline-none focus-visible:underline"
-            >
-              <span>Mehr erfahren</span>
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
+            <div className="mt-6 pt-4 border-t border-[#E9DDDB]">
+              <span className="text-[11px] text-[#775B5D] block">
+                Individuelle Kombination nach ärztlicher Beratung
+              </span>
+            </div>
           </div>
 
-          {/* Block 2: Zonenpakete */}
+          {/* Box 2: ERGÄNZUNGEN (Add-ons) */}
           <div
-            id="portfolio-block-2"
-            className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
+            id="portfolio-card-addons"
+            className={`p-6 sm:p-8 rounded-2xl bg-[#FBF8F6] border transition-all flex flex-col justify-between ${
+              selectedAddons.length > 0 && treatmentType === 'zones'
+                ? 'border-[#B99A99] shadow-sm'
+                : 'border-[#E9DDDB] hover:border-[#D8C4C2]'
+            }`}
           >
             <div>
-              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 02</div>
-              <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
-                Deine Zonen – einzeln oder kombiniert
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs uppercase tracking-wider text-[#B99A99] font-medium">
+                  Ergänzungen
+                </span>
+                {selectedAddons.length > 0 && (
+                  <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#775B5D] text-white">
+                    {selectedAddons.length} gewählt
+                  </span>
+                )}
+              </div>
+              <h3 className="font-serif text-2xl text-[#3E3335] mb-2">
+                Add-ons
               </h3>
-              <p className="text-sm text-[#3E3335]/80 font-light leading-relaxed mb-6">
-                Du entscheidest nicht nach einem starren Standard, sondern gemeinsam mit uns, welche Bereiche zu deinem Ziel passen.
+              <p className="text-xs text-[#3E3335]/70 font-light mb-6">
+                Feine, gezielte Ergänzungen zum gewählten Zonenpaket. Klicke zum Hinzufügen:
               </p>
 
-              {/* Leistungen */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['1 Zone', '2 Zonen', '3 Zonen'].map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]"
-                  >
-                    {item}
-                  </span>
-                ))}
+              <div className="space-y-2">
+                {ADDON_OPTIONS.map((addon) => {
+                  const isSelected = selectedAddons.includes(addon.id);
+                  return (
+                    <button
+                      key={addon.id}
+                      type="button"
+                      onClick={() => handleToggleAddon(addon.id)}
+                      className={`w-full flex items-center justify-between p-3 rounded-xl border text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#D8C4C2]/20 border-[#B99A99] text-[#3E3335]'
+                          : 'bg-white border-[#E9DDDB] text-[#3E3335]/80 hover:border-[#D8C4C2]'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-xs sm:text-sm font-medium text-[#3E3335]">
+                          {addon.name}
+                        </div>
+                        <div className="text-[11px] text-[#3E3335]/65 font-light line-clamp-1">
+                          {addon.description}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 ml-2">
+                        <span className="font-serif text-xs text-[#775B5D]">
+                          {addon.formattedPrice}
+                        </span>
+                        <div
+                          className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                            isSelected
+                              ? 'bg-[#775B5D] border-[#775B5D] text-white'
+                              : 'border-[#D8C4C2]'
+                          }`}
+                        >
+                          {isSelected && <CheckCircle2 className="w-3 h-3" />}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            <button
-              onClick={() => onLearnMore('grundlagen')}
-              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[#775B5D] hover:text-[#3E3335] group focus:outline-none focus-visible:underline"
-            >
-              <span>Mehr erfahren</span>
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
+            <div className="mt-6 pt-4 border-t border-[#E9DDDB]">
+              <span className="text-[11px] text-[#775B5D] block">
+                Kombinierbar mit den klassischen Zonenpaketen
+              </span>
+            </div>
           </div>
 
-          {/* Block 3: Add-ons */}
-          <div
-            id="portfolio-block-3"
-            className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
-          >
-            <div>
-              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 03</div>
-              <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
-                Feine Ergänzungen
-              </h3>
-              <p className="text-sm text-[#3E3335]/80 font-light leading-relaxed mb-6">
-                Kleine Ergänzungen, die je nach Ausgangssituation und Behandlungsziel zusätzlich berücksichtigt werden können.
-              </p>
-
-              {/* Leistungen */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {['Bunny Lines', 'Lip Flip', 'DAO', 'Brow Lift', 'Gummy Smile', 'Kinn'].map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center px-3 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]"
-                  >
-                    {item}
+          {/* Box 3: SPEZIFISCHE BEREICHE (Weitere Anwendungen) */}
+          <div className="flex flex-col justify-between">
+            <div
+              id="portfolio-card-other"
+              className={`p-6 sm:p-8 rounded-2xl bg-[#FBF8F6] border transition-all flex flex-col justify-between flex-1 ${
+                treatmentType === 'other'
+                  ? 'border-[#B99A99] shadow-sm'
+                  : 'border-[#E9DDDB] hover:border-[#D8C4C2]'
+              }`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs uppercase tracking-wider text-[#B99A99] font-medium">
+                    Spezifische Bereiche
                   </span>
-                ))}
+                  {treatmentType === 'other' && (
+                    <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded-full bg-[#775B5D] text-white">
+                      Aktiv
+                    </span>
+                  )}
+                </div>
+                <h3 className="font-serif text-2xl text-[#3E3335] mb-2">
+                  Weitere Anwendungen
+                </h3>
+                <p className="text-xs text-[#3E3335]/70 font-light mb-6">
+                  Spezialisierte Behandlungsansätze nach individueller Prüfung. Klicke zum Auswählen:
+                </p>
+
+                <div className="space-y-2.5">
+                  {OTHER_TREATMENTS.map((item) => {
+                    const isSelected = treatmentType === 'other' && selectedOther === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelectOther(item.id)}
+                        className={`w-full flex items-center justify-between p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-[#D8C4C2]/20 border-[#B99A99] text-[#3E3335]'
+                            : 'bg-white border-[#E9DDDB] text-[#3E3335]/80 hover:border-[#D8C4C2]'
+                        }`}
+                      >
+                        <div className="pr-2">
+                          <div className="text-xs sm:text-sm font-medium text-[#3E3335] leading-snug">
+                            {item.name}
+                          </div>
+                          <div className="text-[11px] text-[#3E3335]/65 font-light line-clamp-1">
+                            {item.description}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span className="font-serif text-xs sm:text-sm text-[#775B5D] whitespace-nowrap">
+                            {item.priceLabel}
+                          </span>
+                          <div
+                            className={`w-4 h-4 rounded-md border flex items-center justify-center transition-colors ${
+                              isSelected
+                                ? 'bg-[#775B5D] border-[#775B5D] text-white'
+                                : 'border-[#D8C4C2]'
+                            }`}
+                          >
+                            {isSelected && <CheckCircle2 className="w-3 h-3" />}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-[#E9DDDB]">
+                <span className="text-[11px] text-[#775B5D] block">
+                  Persönlicher Beratungstermin vorausgesetzt
+                </span>
               </div>
             </div>
 
-            <button
-              onClick={() => onLearnMore('behandlungen')}
-              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[#775B5D] hover:text-[#3E3335] group focus:outline-none focus-visible:underline"
-            >
-              <span>Mehr erfahren</span>
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
-          </div>
-
-          {/* Block 4: Weitere Anwendungen */}
-          <div
-            id="portfolio-block-4"
-            className="p-8 rounded-2xl bg-[#FBF8F6] border border-[#E9DDDB] hover:border-[#D8C4C2] transition-colors flex flex-col justify-between"
-          >
-            <div>
-              <div className="text-xs uppercase tracking-wider text-[#B99A99] font-medium mb-3">Kapitel 04</div>
-              <h3 className="font-serif text-2xl text-[#3E3335] mb-3">
-                Weitere Botulinumtoxinbehandlungen
-              </h3>
-              <p className="text-sm text-[#3E3335]/80 font-light leading-relaxed mb-6">
-                Weitere Behandlungsmöglichkeiten, die einen persönlichen Beratungstermin und eine individuelle ärztliche Einschätzung voraussetzen.
-              </p>
-
-              {/* Leistungen */}
-              <div className="flex flex-wrap gap-2 mb-8">
-                {[
-                  'Masseter',
-                  'Nefertiti',
-                  'Hyperhidrose im Bereich Achseln / Arme',
-                  'Hände',
-                ].map((item) => (
-                  <span
-                    key={item}
-                    className="inline-flex items-center px-3.5 py-1.5 rounded-full bg-[#E9DDDB]/50 border border-[#D8C4C2] text-xs font-medium text-[#3E3335]"
-                  >
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => onLearnMore('behandlungen')}
-              className="inline-flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[#775B5D] hover:text-[#3E3335] group focus:outline-none focus-visible:underline"
-            >
-              <span>Mehr erfahren</span>
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
+            {/* GOÄ-Hinweis direkt unter der Box SPEZIFISCHE BEREICHE mit einem "*" */}
+            <p className="text-[11px] text-[#775B5D] mt-2.5 px-1 font-light leading-relaxed">
+              * Hinweis zur Abrechnung: Die Abrechnung sämtlicher medizinischer Leistungen erfolgt transparent und gesetzeskonform auf Grundlage der amtlichen Gebührenordnung für Ärzte (GOÄ).
+            </p>
           </div>
         </div>
 
-        {/* Subtle connecting Phi line */}
-        <PhiLine variant="divider" className="mt-16 opacity-60" />
+        {/* PREISORIENTIERUNGSLEISTE (entsprechend der angeklickten Leistungen) */}
+        <div className="mb-6 p-5 sm:p-6 rounded-2xl bg-[#E9DDDB]/35 border border-[#D8C4C2] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+          <div>
+            <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-1">
+              Deine Preisorientierung
+            </span>
+            <p className="text-sm text-[#3E3335]">
+              {treatmentType === 'zones' ? (
+                <>
+                  <span className="font-medium">{zoneCount} {zoneCount === 1 ? 'Zone' : 'Zonen'}</span>
+                  {selectedZones.length > 0 && ` (${selectedZones.map(id => ZONE_OPTIONS.find(z => z.id === id)?.name).filter(Boolean).join(', ')})`}
+                  {selectedAddons.length > 0 && (
+                    <span className="text-[#775B5D]">
+                      {' '}+ {selectedAddons.length} Add-on(s) ({selectedAddons.map(id => ADDON_OPTIONS.find(a => a.id === id)?.name).join(', ')})
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <span className="font-medium">
+                    {OTHER_TREATMENTS.find((t) => t.id === selectedOther)?.name}
+                  </span>
+                  <span className="text-[#775B5D]"> (Spezifische Anwendung)</span>
+                </>
+              )}
+            </p>
+          </div>
+          <div className="text-left sm:text-right shrink-0">
+            <span className="text-[11px] uppercase tracking-wider text-[#775B5D] block">
+              Richtpreis
+            </span>
+            <span className="font-serif text-3xl text-[#775B5D] font-normal">
+              ab {calculatedPrice} €
+            </span>
+          </div>
+        </div>
+
+        {/* Zentrierter CTA-Button "Termin anfragen" ans Ende – doppelt so groß dargestellt */}
+        <div className="mt-10 sm:mt-12 flex justify-center">
+          <button
+            id="portfolio-book-btn"
+            type="button"
+            onClick={handleBook}
+            className="inline-flex items-center justify-center gap-4 px-12 sm:px-16 py-5 sm:py-6 rounded-full bg-[#775B5D] text-[#FBF8F6] text-base sm:text-lg uppercase tracking-widest font-semibold hover:bg-[#3E3335] transition-all shadow-md hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+          >
+            <Calendar className="w-6 h-6 text-[#D8C4C2]" />
+            <span>Termin anfragen</span>
+          </button>
+        </div>
       </div>
     </section>
   );
 };
+
+export default Portfolio;

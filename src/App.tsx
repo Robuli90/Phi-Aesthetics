@@ -2,11 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { Portfolio } from './components/Portfolio';
-import { TreatmentPath } from './components/TreatmentPath';
-import { Pricing } from './components/Pricing';
 import { AboutMilena } from './components/AboutMilena';
-import { FaqLexicon } from './components/FaqLexicon';
+import { TreatmentPath } from './components/TreatmentPath';
 import { BookingTool } from './components/BookingTool';
+import { FaqLexicon } from './components/FaqLexicon';
 import { ContactSection } from './components/ContactSection';
 import { SocialMedia } from './components/SocialMedia';
 import { Footer } from './components/Footer';
@@ -150,28 +149,28 @@ function MainApp() {
         {/* Hero Section */}
         <Hero onStartTreatment={() => handleNavigate('termin-buchen')} />
 
-        {/* 1. Was wir anbieten */}
-        <Portfolio onLearnMore={handleLearnMoreFromPortfolio} />
+        {/* 1. Leistungsportfolio und Preise */}
+        <Portfolio
+          onBookTreatment={() => handleNavigate('termin-buchen')}
+          onLearnMore={handleLearnMoreFromPortfolio}
+        />
 
-        {/* 2. Dein Weg */}
-        <TreatmentPath />
-
-        {/* 3. Transparente Preise */}
-        <Pricing onBookTreatment={() => handleNavigate('termin-buchen')} />
-
-        {/* 4. Dr. Milena */}
+        {/* 2. Über mich */}
         <AboutMilena />
 
-        {/* 5. Botox verstehen */}
-        <FaqLexicon initialCategory={faqCategory} />
+        {/* 3. Behandlungsablauf */}
+        <TreatmentPath />
 
-        {/* 6. Termin finden (Preisrechner & SimplyBook Online-Terminbuchung) */}
+        {/* 4. Online Terminbuchung */}
         <BookingTool />
 
-        {/* 7. Sprich mit uns */}
+        {/* 5. Wissens-Lexikon & FAQ */}
+        <FaqLexicon initialCategory={faqCategory} />
+
+        {/* 6. Persönliche Terminabsprache & Standort */}
         <ContactSection onDirectBooking={() => handleNavigate('termin-buchen')} />
 
-        {/* 8. Social Media */}
+        {/* 7. Instagram */}
         <SocialMedia />
       </main>
 

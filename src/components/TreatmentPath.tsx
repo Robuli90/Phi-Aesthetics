@@ -7,23 +7,26 @@ export const TreatmentPath: React.FC = () => {
   const steps = [
     {
       id: 'step-1',
-      marker: 'Beratung',
-      title: 'Individuelle Beratung und Kennenlernen',
-      text: 'Wir besprechen gemeinsam, was dein Ziel mit der Behandlung ist und wie wir dieses bestmöglich erreichen können. Wir erklären dir deine Behandlung genauestens und nehmen dir Sorgen und Ängste, sodass du ganz entspannt in deine Behandlung gehen kannst.',
+      stationNumber: 'Station 1',
+      marker: 'Beratung & Untersuchung',
+      subtitle: 'Dein Wunsch im Mittelpunkt',
+      text: 'Wir besprechen deine Wünsche und schauen uns gemeinsam deine Mimik und Gesichtsanatomie an. Ich erkläre dir die Möglichkeiten und Risiken einer Botox®-Behandlung mit und beantworte deine Fragen. Wenn medizinisch nichts dagegenspricht, kann die Behandlung direkt im Anschluss stattfinden.',
       icon: MessageSquareText,
     },
     {
       id: 'step-2',
+      stationNumber: 'Station 2',
       marker: 'Behandlung',
-      title: 'Die Botulinumtoxinbehandlung',
-      text: 'Als approbierte Ärztin mit einer Fortbildung in der ästhetischen Anwendung von Botulinumtoxin führe ich deine individuelle Behandlung nach aktuellen medizinischen Maßstäben, mit hochwertigen Materialien und medizinischem Botulinumtoxin durch.',
+      subtitle: 'Individuell geplant und ärztlich durchgeführt',
+      text: 'Auf Grundlage deiner Anatomie und Mimik plane ich die Behandlung mit Botox® passend zu deinem gewünschten Ergebnis. Dabei achte ich auf eine sorgfältige Dosierung und die Funktion der behandelten Muskulatur. Die Behandlung führe ich persönlich durch.',
       icon: Sparkles,
     },
     {
       id: 'step-3',
+      stationNumber: 'Station 3',
       marker: 'Nachsorge',
-      title: 'Nachsorge',
-      text: 'Solltest du nach der Behandlung Fragen, Wünsche, Anregungen oder Ähnliches haben, kannst du dich jederzeit bei uns melden. Wir sind auch nach der Behandlung für dich da.',
+      subtitle: 'Individuelle Nachsorge',
+      text: 'Am Ende deines Termins erhältst du alle wichtigen Hinweise für die nächsten Tage auch noch einmal in schriftlicher Form. Sollten Fragen auftreten oder eine Kontrolle sinnvoll sein, bin ich auch nach deinem Termin für dich erreichbar.',
       icon: HeartHandshake,
     },
   ];
@@ -31,7 +34,7 @@ export const TreatmentPath: React.FC = () => {
   return (
     <section
       id="dein-weg"
-      className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
+      className="py-12 md:py-18 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
       aria-labelledby="treatment-path-title"
     >
       <div className="max-w-7xl mx-auto">
@@ -59,7 +62,7 @@ export const TreatmentPath: React.FC = () => {
           {/* Überschrift & Text rechts */}
           <div className="flex-1 flex flex-col justify-center self-center sm:self-start">
             <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
-              Behandlungsablauf
+              Behandlungsablauf – Dein Termin bei Phi Aesthetics
             </span>
             <h2
               id="treatment-path-title"
@@ -88,7 +91,7 @@ export const TreatmentPath: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-10 relative z-10">
-            {steps.map((step, idx) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
                 <div
@@ -102,13 +105,13 @@ export const TreatmentPath: React.FC = () => {
                   </div>
 
                   {/* Marker label */}
-                  <div className="text-xs uppercase tracking-widest text-[#B99A99] font-medium mb-2">
-                    Station {idx + 1} • {step.marker}
+                  <div className="text-xs uppercase tracking-widest text-[#B99A99] font-medium mb-1">
+                    {step.stationNumber}: {step.marker}
                   </div>
 
-                  {/* Step Title */}
-                  <h3 className="font-serif text-xl sm:text-2xl text-[#3E3335] mb-4 font-normal">
-                    {step.title}
+                  {/* Subtitle / Headline */}
+                  <h3 className="font-serif text-xl sm:text-2xl text-[#3E3335] mb-3 font-normal">
+                    {step.subtitle}
                   </h3>
 
                   {/* Step Description */}
@@ -124,3 +127,5 @@ export const TreatmentPath: React.FC = () => {
     </section>
   );
 };
+
+export default TreatmentPath;

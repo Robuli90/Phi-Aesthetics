@@ -45,13 +45,12 @@ export const CONTACT_CONFIG = {
 
 export const NAVIGATION_ITEMS: NavItem[] = [
   { id: 'angebote', label: 'Was wir anbieten', href: '#angebote' },
-  { id: 'dein-weg', label: 'Dein Weg', href: '#dein-weg' },
-  { id: 'preise', label: 'Transparente Preise', href: '#preise' },
-  { id: 'dr-milena', label: 'Dr. Milena Philippi', href: '#dr-milena' },
-  { id: 'botulinumtoxin-verstehen', label: 'Botulinumtoxin verstehen', href: '#botulinumtoxin-verstehen' },
-  { id: 'termin-buchen', label: 'Termin finden', href: '#termin-buchen' },
-  { id: 'kontakt', label: 'Sprich mit uns', href: '#kontakt' },
-  { id: 'social-media', label: 'Social Media', href: '#social-media' },
+  { id: 'dr-milena', label: 'Über mich', href: '#dr-milena' },
+  { id: 'dein-weg', label: 'Behandlungsablauf', href: '#dein-weg' },
+  { id: 'termin-buchen', label: 'Online Terminbuchung', href: '#termin-buchen' },
+  { id: 'botulinumtoxin-verstehen', label: 'Wissens-Lexikon & FAQ', href: '#botulinumtoxin-verstehen' },
+  { id: 'kontakt', label: 'Persönliche Terminabsprache', href: '#kontakt' },
+  { id: 'social-media', label: 'Instagram', href: '#social-media' },
 ];
 
 export const ZONE_OPTIONS: ZoneOption[] = [
@@ -110,18 +109,23 @@ export const FAQ_DATA: FaqItem[] = [
   // 1. Grundlagen
   {
     category: 'grundlagen',
-    term: 'Botulinumtoxin',
-    explanation: 'Ein bewährtes, gereinigtes Protein aus der medizinischen Praxis, das die Signalübertragung zwischen Nerv und Muskel vorübergehend hemmt. Der Wirkstoff wird gezielt und individuell eingesetzt, um bestimmte Muskelaktivitäten vorübergehend zu reduzieren.',
+    term: 'Botulinumtoxin „Botox®"',
+    explanation: 'Botulinumtoxin A, umgangssprachlich häufig als Botox® bezeichnet, ist ein Arzneistoff, der die Signalübertragung zwischen Nerven und Muskeln vorrübergehend hemmt. In der ästhetischen Medizin wird diese Wirkung genutzt, um bestimmte Gesichtsmuskeln gezielt zu entspannen und mimisch bedingte Falten zu reduzieren. Die Wirkung ist zeitlich begrenzt.',
+  },
+  {
+    category: 'grundlagen',
+    term: 'Was ist der Unterschied zwischen Botulinumtoxin und Botox®?',
+    explanation: 'Botulinumtoxin ist der medizinische Wirkstoff, während Botox® der Markenname eines bestimmten Arzneimittels ist. Im allgemeinen Sprachgebrauch wird Botox® häufig als Sammelbegriff für Behandlungen mit Botulinumtoxin verwendet. Es gibt jedoch verschiedene Präparate, die denselben Wirkstofftyp enthalten und sich unter anderem in ihrer Herstellung und Formulierung unterscheiden.',
   },
   {
     category: 'grundlagen',
     term: 'Wirkungseintritt',
-    explanation: 'Der Wirkungseintritt erfolgt nicht bei allen Menschen exakt gleich. Wie schnell sich eine Veränderung zeigt, hängt unter anderem von der behandelten Region und deiner individuellen Gewebereaktion ab – erste Effekte sind meist nach wenigen Tagen sichtbar, das Endergebnis nach etwa zwei Wochen.',
+    explanation: 'Eine der häufigsten Fragen von Patienten ist: „Wann fängt mein Botox® an zu wirken?“\n\nDer Wirkungseintritt erfolgt nicht bei allen Menschen exakt gleich. Wie schnell sich eine Veränderung zeigt, hängt unter anderem von der behandelten Region und deiner individuellen Gewebereaktion ab – erste Effekte sind meist nach wenigen Tagen sichtbar, das Endergebnis nach etwa zwei Wochen.',
   },
   {
     category: 'grundlagen',
-    term: 'Haltbarkeit',
-    explanation: 'Die Haltbarkeit kann individuell unterschiedlich sein und liegt typischerweise zwischen 3 und 6 Monaten. Im persönlichen Gespräch wird besprochen, welche Erwartungen realistisch sind.',
+    term: 'Wirkungsdauer',
+    explanation: 'Die zweithäufigste Frage ist „Wie lange hält die Wirkung von Botox® an?“\n\nDie Haltbarkeit kann individuell unterschiedlich sein und liegt typischerweise zwischen 3 und 6 Monaten. Im persönlichen Gespräch wird besprochen, welche Erwartungen realistisch sind.',
   },
   {
     category: 'grundlagen',
@@ -216,6 +220,11 @@ export const FAQ_DATA: FaqItem[] = [
     category: 'ablauf',
     term: 'Beratung',
     explanation: 'Jeder Behandlung geht eine ausführliche ärztliche Anamnese und Gesichtsdiagnostik voraus, bei der wir deine Wünsche, Anatomie und realistische Ziele besprechen.',
+  },
+  {
+    category: 'ablauf',
+    term: 'Aufklärung',
+    explanation: 'Vor einer Behandlung mit Botulinumtoxin (Botox®) kläre ich dich persönlich über die Wirkweise, mögliche Risiken oder Nebenwirkungen sowie Behandlungsalternativen auf. Du hast ausreichend Gelegenheit Fragen zu stellen und anschließend in Ruhe zu entscheiden, ob du die Behandlung möchtest.',
   },
   {
     category: 'ablauf',

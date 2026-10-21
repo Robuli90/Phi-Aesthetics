@@ -12,35 +12,35 @@ export const Hero: React.FC<HeroProps> = ({ onStartTreatment }) => {
   return (
     <section
       id="hero"
-      className="relative min-h-[85vh] flex items-center justify-center bg-[#FBF8F6] px-4 sm:px-6 lg:px-8 py-16 md:py-24"
+      className="relative flex items-center justify-center bg-[#FBF8F6] px-4 sm:px-6 lg:px-8 pt-6 sm:pt-8 md:pt-10 pb-12 sm:pb-14 md:pb-16"
       aria-labelledby="hero-title"
     >
       {/* Hintergrund bleibt absolut frei und unbedruckt */}
 
       {/* Hero content container */}
       <div className="relative z-10 max-w-3xl mx-auto text-center flex flex-col items-center">
-        {/* Original unverändertes Logo_Phi.png als <img> Element */}
-        <div className="mb-8 md:mb-10 flex justify-center">
+        {/* Original unverändertes Logo_Phi.png als <img> Element – auf ca. die Hälfte verkleinert */}
+        <div className="mb-4 md:mb-6 flex justify-center">
           <img
             src={imgSrc}
             alt="Phi Aesthetics – Ärztliche Ästhetik – So Individuell wie Du"
             referrerPolicy="no-referrer"
             onError={() => setImgSrc('/Logo_Phi.png')}
-            className="w-64 sm:w-72 md:w-80 lg:w-96 max-w-full aspect-square object-contain mix-blend-multiply drop-shadow-xs transition-transform duration-300 hover:scale-[1.02]"
+            className="w-32 sm:w-36 md:w-40 lg:w-48 max-w-full aspect-square object-contain mix-blend-multiply drop-shadow-xs transition-transform duration-300 hover:scale-[1.02]"
           />
         </div>
 
-        {/* Prominente Headline */}
+        {/* Headline – zwei Schriftgrößen kleiner */}
         <h1
           id="hero-title"
-          className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#3E3335] leading-[1.15] font-normal tracking-tight mb-6 max-w-2xl"
+          className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#3E3335] leading-[1.2] font-normal tracking-tight mb-4 max-w-2xl"
         >
-          Ärztliche Ästhetik – So Individuell wie Du
+          Ästhetische Medizin. Persönlich und auf deine Bedürfnisse abgestimmt.
         </h1>
 
-        {/* Kurze Einleitung */}
-        <p className="text-base sm:text-lg md:text-xl text-[#3E3335]/85 leading-relaxed font-light max-w-xl mb-10 text-balance">
-          Ästhetische Medizin beginnt für uns mit einem persönlichen Gespräch: mit deinen Wünschen, deinem Gesicht und dem, was sich für dich richtig anfühlt.
+        {/* Teaser – zwei Schriftgrößen kleiner */}
+        <p className="text-sm sm:text-base text-[#3E3335]/85 leading-relaxed font-light max-w-xl mb-8 text-balance">
+          Deine Arztpraxis für ästhetische Faltenbehandlungen mit Botulinumtoxin in Köln-Lindenthal.
         </p>
 
         {/* Genau ein primärer CTA */}

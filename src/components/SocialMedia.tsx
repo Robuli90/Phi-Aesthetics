@@ -16,7 +16,7 @@ export const SocialMedia: React.FC = () => {
   return (
     <section
       id="social-media"
-      className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
+      className="py-12 md:py-18 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
       aria-labelledby="social-media-title"
     >
       <div className="max-w-4xl mx-auto">

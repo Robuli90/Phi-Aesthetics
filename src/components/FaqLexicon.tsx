@@ -11,7 +11,7 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
     'grundlagen' | 'behandlungen' | 'ablauf' | 'sicherheit'
   >(initialCategory);
   const [openItems, setOpenItems] = useState<Record<string, boolean>>({
-    Botulinumtoxin: true,
+    'Botulinumtoxin „Botox®"': true,
     Glabella: true,
     Beratung: true,
     'Rötungen & Schwellungen': true,
@@ -44,13 +44,13 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
   return (
     <section
       id="botulinumtoxin-verstehen"
-      className="py-20 md:py-28 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
+      className="py-12 md:py-18 px-4 sm:px-6 lg:px-8 bg-[#FBF8F6] border-t border-[#E9DDDB]"
       aria-labelledby="faq-title"
     >
       <div id="botox-verstehen" className="sr-only" aria-hidden="true" />
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10">
           <span className="text-xs uppercase tracking-widest text-[#775B5D] font-medium block mb-2">
             Wissens-Lexikon & FAQ
           </span>
@@ -58,7 +58,7 @@ export const FaqLexicon: React.FC<FaqLexiconProps> = ({ initialCategory = 'grund
             id="faq-title"
             className="font-serif text-3xl sm:text-4xl text-[#3E3335] font-normal mb-4"
           >
-            Botulinumtoxin verstehen
+            Botulinumtoxin - „Botox®“ - verstehen
           </h2>
           <p className="text-base text-[#3E3335]/80 font-light max-w-xl mx-auto">
             Medizinisch verständlich erklärt: Antworten auf wichtige Fragen rund um Wirkungsweise, Zonen, Ablauf und Sicherheit.
